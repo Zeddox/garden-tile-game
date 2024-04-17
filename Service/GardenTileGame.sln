@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GardenTileGame.API", "GardenTileGame\GardenTileGame.API.csproj", "{9E3DA7D2-EEB9-4BC1-A89E-1A5927B1BC06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GardenTileGame.Data", "GardenTileGame.Data\GardenTileGame.Data.csproj", "{33D9264D-D712-43DC-BCA0-EF5EB6777388}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E3DA7D2-EEB9-4BC1-A89E-1A5927B1BC06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E3DA7D2-EEB9-4BC1-A89E-1A5927B1BC06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E3DA7D2-EEB9-4BC1-A89E-1A5927B1BC06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E3DA7D2-EEB9-4BC1-A89E-1A5927B1BC06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33D9264D-D712-43DC-BCA0-EF5EB6777388}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33D9264D-D712-43DC-BCA0-EF5EB6777388}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33D9264D-D712-43DC-BCA0-EF5EB6777388}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33D9264D-D712-43DC-BCA0-EF5EB6777388}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C5EA358-4EFD-4DA7-8E60-94A9C9011832}
+	EndGlobalSection
+EndGlobal
