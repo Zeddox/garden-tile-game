@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
+using NSwag;
 
 namespace GardenTileGame.API;
 
@@ -10,6 +12,10 @@ public static class StartupExtensions
     {
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         return serviceCollection;
+            //.AddHeaderPropagation(options =>
+            //{
+            //    options.Headers.Add("Authorization");
+            //});
     }
 
     public static IServiceCollection AddDbConnections<TContext>(this IServiceCollection serviceCollection, IConfiguration configuration, string environment) where TContext : DbContext
@@ -37,7 +43,7 @@ public static class StartupExtensions
         {
             return serviceCollection.AddDbContext<TContext>(options => options
                 .UseLazyLoadingProxies()
-                .UseCosmos(connectionString, databaseName));
+                .UseCosmos(connectionString, databaseName: databaseName, cosmosCientOptions => new CosmosClientOptions { AllowBulkExecution = true }));
         }
     }
 
@@ -57,8 +63,16 @@ public static class StartupExtensions
                 };
             };
 
+            //config.AddSecurity("Bearer", new List<string>(), new OpenApiSecurityScheme
+            //{
+            //    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+            //    Name = "Authorization",
+            //    In = OpenApiSecurityApiKeyLocation.Header,
+            //    Type = OpenApiSecuritySchemeType.ApiKey
+            //});
+
             // NOTES: Not quite sure if we need this yet
-            //config.AddSecurity()
+            //config.AddSecurity();
         });
     }
 
@@ -73,11 +87,12 @@ public static class StartupExtensions
     {
         return serviceCollection.AddCors(options =>
         {
-            options.AddPolicy("CorsPolicy", opts => opts
-                .WithOrigins(new[] { configuration.GetValue<string>("ClientUrl")! })
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials());
+        options.AddPolicy("CorsPolicy", opts => opts
+            .WithOrigins(new[] { configuration.GetValue<string>("ClientUrl")! })
+            //.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
         });
     }
 

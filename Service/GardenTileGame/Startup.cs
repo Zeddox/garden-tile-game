@@ -29,7 +29,7 @@ public class Startup
             .AddServices(_configuration)
             .AddProblemDetails()
             .AddCors(_configuration)
-            .AddOpenApi(1, "CAMP API")
+            .AddOpenApi(1, "Garden Tile Game API")
             .AddMvcWithOptions()
             .AddControllersAsServices()
             .AddJsonOptions(options =>
@@ -37,9 +37,11 @@ public class Startup
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
     }
-    public void Configure(IApplicationBuilder app)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, GardenTileGameDbContext dbContext)
     {
         app.ConfigureSecurityHeaders();
+        //dbContext.Database.EnsureCreated();
+
         app
             .UseSecurityHeaders()
             .RouteNonApiCallsToClient()
@@ -63,5 +65,12 @@ public class Startup
             {
                 endpoints.MapControllers();
             });
+
+        //dbContext.Database.EnsureCreated();
     }
+
+    //public void Configure(IApplicationBuilder app, IWebHostEnvironment env, GardenTileGameDbContext dbContext)
+    //{
+    //    dbContext.Database.EnsureCreated();
+    //}
 }
