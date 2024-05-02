@@ -7,23 +7,23 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GardenTileGame.API.Controllers;
 
-//[Route(ApiRoutes.GamesBase)]
-[Route("[controller]")]
+[Route(ApiRoutes.GamesBase)]
+//[Route("[controller]")]
 public class GameController : BaseController
 {
     private readonly ILogger<GameController> _logger;
-    //private readonly GardenTileGameDbContext _db;
+    private readonly GardenTileGameDbContext _db;
 
-    //public GameController(ILogger<GameController> logger,
-    //    GardenTileGameDbContext dbContext) : base()
-    //{
-    //    _logger = logger;
-    //    _db = dbContext;
-    //}
-    public GameController(ILogger<GameController> logger) : base()
+    public GameController(ILogger<GameController> logger,
+        GardenTileGameDbContext dbContext) : base()
     {
         _logger = logger;
+        _db = dbContext;
     }
+    //public GameController(ILogger<GameController> logger) : base()
+    //{
+    //    _logger = logger;
+    //}
 
     /// <summary>
     /// Create a new Game.
@@ -39,8 +39,8 @@ public class GameController : BaseController
             GameStatus = GameStatus.Setup
         };
 
-        //_db.Games.Add(game);
-        //await _db.SaveChangesAsync(cancellationToken);
+        _db.Games.Add(game);
+        await _db.SaveChangesAsync(cancellationToken);
 
         return CreatedAtAction(nameof(CreateNewGame), game.ToDto());
     }

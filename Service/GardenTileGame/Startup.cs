@@ -40,8 +40,6 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, GardenTileGameDbContext dbContext)
     {
         app.ConfigureSecurityHeaders();
-        //dbContext.Database.EnsureCreated();
-
         app
             .UseSecurityHeaders()
             .RouteNonApiCallsToClient()
@@ -65,12 +63,5 @@ public class Startup
             {
                 endpoints.MapControllers();
             });
-
-        //dbContext.Database.EnsureCreated();
     }
-
-    //public void Configure(IApplicationBuilder app, IWebHostEnvironment env, GardenTileGameDbContext dbContext)
-    //{
-    //    dbContext.Database.EnsureCreated();
-    //}
 }

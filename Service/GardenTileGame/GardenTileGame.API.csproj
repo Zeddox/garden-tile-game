@@ -29,9 +29,9 @@
 
 	<!-- https://github.com/RicoSuter/NSwag/wiki/Assembly-loading#net-core -->
 	<!-- build TypeScript client and DTOs for this backend -->
-	<!--<Target Name="NSwag" AfterTargets="Build">
+	<Target Name="NSwag" AfterTargets="Build">
 		<Copy SourceFiles="@(Reference)" DestinationFolder="$(OutDir)References" />
 		<Exec Command="$(NSwagExe_Net60) run nswag.json /variables:OutDir=$(OutDir),Configuration=$(Configuration)" />
 		<RemoveDir Directories="$(OutDir)References" />
-	</Target>-->
+	</Target>
 </Project>
