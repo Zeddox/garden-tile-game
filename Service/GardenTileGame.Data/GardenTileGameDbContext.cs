@@ -6,7 +6,7 @@ namespace GardenTileGame.Data;
 
 public class GardenTileGameDbContext : DbContext
 {
-    //public DbSet<Game> Games { get; set; }
+    public DbSet<Game> Games { get; set; }
 
     public GardenTileGameDbContext(DbContextOptions options) : base(options)
     {
@@ -15,7 +15,7 @@ public class GardenTileGameDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
     }
 

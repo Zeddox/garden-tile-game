@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace GardenTileGame.API.Controllers;
 
 [Route(ApiRoutes.GamesBase)]
-//[Route("[controller]")]
 public class GameController : BaseController
 {
     private readonly ILogger<GameController> _logger;
@@ -20,10 +19,6 @@ public class GameController : BaseController
         _logger = logger;
         _db = dbContext;
     }
-    //public GameController(ILogger<GameController> logger) : base()
-    //{
-    //    _logger = logger;
-    //}
 
     /// <summary>
     /// Create a new Game.

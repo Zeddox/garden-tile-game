@@ -7,10 +7,10 @@ namespace GardenTileGame.Data.Models;
 
 public class Game : BaseModel<int>
 {
-    //[Required, MaxLength(64)]
+    [Required, MaxLength(64)]
     public string GameName { get; set; }
 
-    //[Required]
+    [Required]
     public GameStatus GameStatus { get; set; }
 }
 
