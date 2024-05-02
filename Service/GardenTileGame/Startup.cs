@@ -29,7 +29,7 @@ public class Startup
             .AddServices(_configuration)
             .AddProblemDetails()
             .AddCors(_configuration)
-            .AddOpenApi(1, "CAMP API")
+            .AddOpenApi(1, "Garden Tile Game API")
             .AddMvcWithOptions()
             .AddControllersAsServices()
             .AddJsonOptions(options =>

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
+using NSwag;
 
 namespace GardenTileGame.API;
 
@@ -37,7 +39,7 @@ public static class StartupExtensions
         {
             return serviceCollection.AddDbContext<TContext>(options => options
                 .UseLazyLoadingProxies()
-                .UseCosmos(connectionString, databaseName));
+                .UseCosmos(connectionString, databaseName: databaseName));
         }
     }
 
@@ -58,7 +60,13 @@ public static class StartupExtensions
             };
 
             // NOTES: Not quite sure if we need this yet
-            //config.AddSecurity()
+            //config.AddSecurity("Bearer", new List<string>(), new OpenApiSecurityScheme
+            //{
+            //    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+            //    Name = "Authorization",
+            //    In = OpenApiSecurityApiKeyLocation.Header,
+            //    Type = OpenApiSecuritySchemeType.ApiKey
+            //});
         });
     }
 
