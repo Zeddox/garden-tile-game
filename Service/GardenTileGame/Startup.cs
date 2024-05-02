@@ -37,7 +37,7 @@ public class Startup
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
     }
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, GardenTileGameDbContext dbContext)
+    public void Configure(IApplicationBuilder app)
     {
         app.ConfigureSecurityHeaders();
         app

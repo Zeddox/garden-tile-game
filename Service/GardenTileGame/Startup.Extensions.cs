@@ -81,11 +81,11 @@ public static class StartupExtensions
     {
         return serviceCollection.AddCors(options =>
         {
-        options.AddPolicy("CorsPolicy", opts => opts
-            .WithOrigins(new[] { configuration.GetValue<string>("ClientUrl")! })
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
+            options.AddPolicy("CorsPolicy", opts => opts
+                .WithOrigins(new[] { configuration.GetValue<string>("ClientUrl")! })
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
         });
     }
 
