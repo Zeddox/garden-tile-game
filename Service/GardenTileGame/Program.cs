@@ -1,4 +1,5 @@
 
+using GardenTileGame.API.Hubs;
 using GardenTileGame.Data;
 
 namespace GardenTileGame.API
