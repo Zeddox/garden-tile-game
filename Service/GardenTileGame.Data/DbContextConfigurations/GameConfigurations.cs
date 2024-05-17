@@ -10,9 +10,15 @@ public class GameConfigurations : IEntityTypeConfiguration<Game>
     {
         builder.ToContainer("Games")
             .HasNoDiscriminator()
-            .HasKey(g => g.Id);
+            .HasKey(x => x.Id);
 
         builder.Property(x => x.GameStatus)
             .HasConversion(x => (int)x, x => (GameStatus)x);
+
+        builder.OwnsMany(x => x.Players, y =>
+        {
+            y.WithOwner().HasForeignKey(x => x.GameId);
+            y.HasKey("Id");
+        });
     }
 }

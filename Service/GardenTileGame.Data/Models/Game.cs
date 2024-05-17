@@ -5,13 +5,15 @@ using System.Net.NetworkInformation;
 
 namespace GardenTileGame.Data.Models;
 
-public class Game : BaseModel<int>
+public class Game : BaseModel<Guid>
 {
     [Required, MaxLength(64)]
     public string GameName { get; set; }
 
     [Required]
     public GameStatus GameStatus { get; set; }
+
+    public IList<Player> Players { get; set; }
 }
 
 public static class GameExtensions
@@ -22,7 +24,8 @@ public static class GameExtensions
         {
             Id = game.Id,
             GameName = game.GameName,
-            GameStatus = game.GameStatus
+            GameStatus = game.GameStatus,
+            Players = game.Players.Select(x => x.ToDto()).ToList()
         };
     }
 }

@@ -1,4 +1,5 @@
-﻿using GardenTileGame.API.Infrastructure;
+﻿using GardenTileGame.API.Hubs;
+using GardenTileGame.API.Infrastructure;
 using GardenTileGame.Data;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
@@ -22,6 +23,8 @@ public class Startup
             {
                 options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
             });
+
+        services.AddSignalR();
 
         services
             .AddResponseCompression()
@@ -62,6 +65,7 @@ public class Startup
             .UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<GameHub>("/game-hub");
             });
     }
 }
