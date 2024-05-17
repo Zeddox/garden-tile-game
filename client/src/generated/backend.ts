@@ -144,12 +144,69 @@ export class ApiClient extends ApiClientBase {
         }
         return Promise.resolve<GameDto[]>(null as any);
     }
+
+    game_UpdateGame(dto: GameDto): Promise<void> {
+        let url_ = this.baseUrl + "/api/games";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processGame_UpdateGame(_response);
+        });
+    }
+
+    protected processGame_UpdateGame(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 204) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ValidationProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ProblemDetails.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<void>(null as any);
+    }
 }
 
-export class BaseDtoOfInteger implements IBaseDtoOfInteger {
-    id!: number;
+export class BaseDtoOfGuid implements IBaseDtoOfGuid {
+    id!: string;
 
-    constructor(data?: IBaseDtoOfInteger) {
+    constructor(data?: IBaseDtoOfGuid) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -164,9 +221,9 @@ export class BaseDtoOfInteger implements IBaseDtoOfInteger {
         }
     }
 
-    static fromJS(data: any): BaseDtoOfInteger {
+    static fromJS(data: any): BaseDtoOfGuid {
         data = typeof data === 'object' ? data : {};
-        let result = new BaseDtoOfInteger();
+        let result = new BaseDtoOfGuid();
         result.init(data);
         return result;
     }
@@ -178,13 +235,14 @@ export class BaseDtoOfInteger implements IBaseDtoOfInteger {
     }
 }
 
-export interface IBaseDtoOfInteger {
-    id: number;
+export interface IBaseDtoOfGuid {
+    id: string;
 }
 
-export class GameDto extends BaseDtoOfInteger implements IGameDto {
+export class GameDto extends BaseDtoOfGuid implements IGameDto {
     gameName!: string;
     gameStatus!: GameStatus;
+    players?: PlayerDto[] | undefined;
 
     constructor(data?: IGameDto) {
         super(data);
@@ -195,6 +253,11 @@ export class GameDto extends BaseDtoOfInteger implements IGameDto {
         if (_data) {
             this.gameName = _data["gameName"];
             this.gameStatus = _data["gameStatus"];
+            if (Array.isArray(_data["players"])) {
+                this.players = [] as any;
+                for (let item of _data["players"])
+                    this.players!.push(PlayerDto.fromJS(item));
+            }
         }
     }
 
@@ -209,20 +272,59 @@ export class GameDto extends BaseDtoOfInteger implements IGameDto {
         data = typeof data === 'object' ? data : {};
         data["gameName"] = this.gameName;
         data["gameStatus"] = this.gameStatus;
+        if (Array.isArray(this.players)) {
+            data["players"] = [];
+            for (let item of this.players)
+                data["players"].push(item.toJSON());
+        }
         super.toJSON(data);
         return data;
     }
 }
 
-export interface IGameDto extends IBaseDtoOfInteger {
+export interface IGameDto extends IBaseDtoOfGuid {
     gameName: string;
     gameStatus: GameStatus;
+    players?: PlayerDto[] | undefined;
 }
 
 export enum GameStatus {
     Setup = 0,
     InProgress = 1,
     Finished = 2,
+}
+
+export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
+    name?: string | undefined;
+
+    constructor(data?: IPlayerDto) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.name = _data["name"];
+        }
+    }
+
+    static override fromJS(data: any): PlayerDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PlayerDto();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IPlayerDto extends IBaseDtoOfGuid {
+    name?: string | undefined;
 }
 
 export class ProblemDetails implements IProblemDetails {
