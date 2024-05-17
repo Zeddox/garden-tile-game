@@ -1,4 +1,4 @@
-import { ApiClient, CreateGameDto, GameDto, ICreateGameDto, IGameDto, IUpdateGameDto, UpdateGameDto } from '@/generated/backend';
+import { ApiClient, CreateGameDto, ICreateGameDto, IGameDto, IUpdateGameDto, UpdateGameDto } from '@/generated/backend';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const gameApiQueryKeys = {

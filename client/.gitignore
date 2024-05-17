@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# nswag-generated files
+**/client/src/generated/*
+!**/client/src/generated/__mocks__/
