@@ -8,6 +8,7 @@ using GardenTileGame.Data.Routes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace GardenTileGame.API.Controllers;
 
@@ -34,13 +35,21 @@ public class GameController : BaseController
     /// <param name="dto">A Game DTO.</param>
     [HttpPost]
     [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Post))]
-    public async Task<ActionResult<GameDto>> CreateNewGame([FromBody] GameDto dto, CancellationToken cancellationToken)
+    public async Task<ActionResult<GameDto>> CreateNewGame([FromBody] CreateGameDto dto, CancellationToken cancellationToken)
     {
         var game = new Game
         {
-            Id = dto.Id,
+            Id = Guid.NewGuid(),
             GameName = dto.GameName,
-            GameStatus = GameStatus.Setup
+            GameStatus = GameStatus.Setup,
+            Players = new List<Player>
+            {
+                new Player
+                {
+                    Id = Guid.NewGuid(),
+                    Name = dto.PlayerName
+                }
+            }
         };
 
         _db.Games.Add(game);
@@ -66,5 +75,64 @@ public class GameController : BaseController
             .ToListAsync(cancellationToken);
 
         return Ok(games);
+    }
+
+    /// <summary>
+    /// Get Game by ID
+    /// </summary>
+    /// <returns>The Game</returns>
+    [HttpGet("{id}")]
+    [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Get))]
+    public async Task<ActionResult<GameDto>> GetGameById(Guid id, CancellationToken cancellationToken)
+    {
+        var game = await _db.Games.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (game == null)
+        {
+            throw new Exception($"Game with ID: {id} could not be found");
+
+        }
+
+        return Ok(game.ToDto());
+    }
+
+    /// <summary>
+    /// Create a new Game.
+    /// Client is notified of Game creation via SignalR
+    /// </summary>
+    /// <param name="dto">A Game DTO.</param>
+    [HttpPut]
+    [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Put))]
+    public async Task<ActionResult> UpdateGame([FromBody] UpdateGameDto dto, CancellationToken cancellationToken)
+    {
+        var game = await _db.Games.FirstOrDefaultAsync(x => x.Id == Guid.Parse(dto.Id), cancellationToken);
+
+        if (game == null)
+        {
+            throw new Exception($"Game {dto.Id} could not be found");
+        }
+
+        if (!string.IsNullOrEmpty(dto.PlayerName))
+        {
+            var player = new Player
+            {
+                Id = Guid.NewGuid(),
+                Name = dto.PlayerName
+            };
+
+            game.Players.Add(player);
+
+            var playerDto = player.ToDto();
+            playerDto.GameId = game.Id;
+
+            await _gameHubContext.Clients.All.NotifyPlayerAdded(playerDto);
+        }
+
+        game.GameStatus = dto.GameStatus;
+
+        _db.Games.Update(game);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return Ok();
     }
 }

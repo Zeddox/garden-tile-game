@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import * as signalR from '@microsoft/signalr';
-import { GameDto } from '@/generated/backend';
+import { GameDto, IGameDto, PlayerDto } from '@/generated/backend';
 import { gameApiQueryKeys } from './gameApi';
 
 export const connectToGameHub = (queryClient: QueryClient) => {
@@ -17,5 +17,16 @@ export const connectToGameHub = (queryClient: QueryClient) => {
             return next;
         });
     });
+
+    connection.on('NotifyPlayerAdded', (player: PlayerDto) => {
+        console.log('playerAdded', { player });
+        queryClient.setQueryData<IGameDto>(gameApiQueryKeys.game(player.gameId!), (prev) => {
+            const next = prev ? { ...prev } : new GameDto();
+            next.players?.push(player);
+
+            return next;
+        });
+    });
+    
     return connection;
 };

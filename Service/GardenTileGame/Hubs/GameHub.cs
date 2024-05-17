@@ -10,4 +10,9 @@ public class GameHub : Hub<IGameClient>
     {
         await Clients.All.NotifyGameCreated(game.ToDto());
     }
+
+    public async Task NotifyPlayerAdded(Player player)
+    {
+        await Clients.All.NotifyPlayerAdded(player.ToDto());
+    }
 }
