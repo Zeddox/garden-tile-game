@@ -1,15 +1,16 @@
-import { useState } from 'react';
+import { Link } from '@tanstack/react-router';
 import './App.css';
-import { Button } from './components/ui/button';
-import { Input } from './components/ui/input';
-import { useCreateGame, useGames } from './services/gameApi';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { GameCreationDialog } from './GameCreationDialog';
+import { useGames } from './services/gameApi';
 
 export const AppIndex = () => {
+    const { data: games } = useGames();
+
     return (
         <div className={'grid grid-cols-5 gap-4'}>
-            <GameList />
-            <GameCreation />
+            {(games?.length ?? 0) > 0 ? <GameList /> : null}
+
+            <GameCreationDialog />
         </div>
     );
 };
@@ -27,39 +28,6 @@ const GameList = () => {
                     </Link>
                 </div>
             ))}
-        </div>
-    );
-};
-
-const GameCreation = () => {
-    const navigate = useNavigate();
-    const { mutate: createGame, error } = useCreateGame();
-
-    const [gameName, setGameName] = useState('');
-    const [playerName, setPlayerName] = useState('');
-
-    const canCreateGame = gameName.length > 0 && playerName.length > 0;
-
-    return (
-        <div className={'col-span-2 flex flex-col gap-2'}>
-            <Input placeholder={'Enter Player Name'} value={playerName} onChange={(ev) => setPlayerName(ev.target.value)} />
-            <Input placeholder={'Enter Game Name'} value={gameName} onChange={(ev) => setGameName(ev.target.value)} />
-            <Button
-                onClick={() => {
-                    createGame(
-                        { gameName, playerName },
-                        {
-                            onSuccess: (dto) => {
-                                navigate({ to: `/game/$gameId/lobby`, params: { gameId: dto.id } });
-                            }
-                        }
-                    );
-                }}
-                disabled={!canCreateGame}
-            >
-                {'Create Game'}
-            </Button>
-            {error !== undefined ? <div className={'text-red-800'}>{error?.message}</div> : null}
         </div>
     );
 };
