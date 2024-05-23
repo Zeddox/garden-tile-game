@@ -8,7 +8,7 @@ export const AppIndex = () => {
     const { data: games } = useGames();
 
     return (
-        <div className={'grid grid-cols-9 gap-4'}>
+        <div className={'grid grid-cols-10 gap-8'}>
             {(games?.length ?? 0) > 0 ? <GameList /> : null}
             <GameCreationDialog />
         </div>
@@ -22,7 +22,7 @@ const GameList = () => {
         <>
             <Card
                 className={
-                    'col-[2_/_5] flex flex-col gap-4 p-4  shadow-slate-950 shadow-md border-slate-700/40 bg-gradient-to-b from-slate-700/30 from-10% via-[#181b1a] via-60% to-[#181b1a] to-100%'
+                    'col-[2_/_6] flex flex-col gap-4 p-4  shadow-slate-950 shadow-md border-slate-700/40 bg-gradient-to-b from-slate-700/30 from-10% via-[#181b1a] via-60% to-[#181b1a] to-100%'
                 }
             >
                 <h2 className={'text-2xl font-semibold text-slate-300'}>{'My Games'}</h2>
@@ -48,7 +48,7 @@ const GameList = () => {
             </Card>
             <Card
                 className={
-                    'col-[6_/_9] flex flex-col gap-4 p-4  shadow-slate-950 shadow-md border-slate-700/40 bg-gradient-to-b from-slate-700/30 from-10% via-[#181b1a] via-60% to-[#181b1a] to-100%'
+                    'col-[6_/_10] flex flex-col gap-4 p-4  shadow-slate-950 shadow-md border-slate-700/40 bg-gradient-to-b from-slate-700/30 from-10% via-[#181b1a] via-60% to-[#181b1a] to-100%'
                 }
             >
                 <h2 className={'text-2xl font-semibold text-slate-300'}>{'Games to Join'}</h2>
