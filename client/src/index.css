@@ -32,6 +32,23 @@
         --ring: 159 36% 72%;
 
         --radius: 0.5rem;
+
+        --primary-10: #020403;
+        --primary-20: #101c16;
+        --primary-30: #152e23;
+        --primary-40: #183c2d;
+        --primary-50: #1b4a36;
+        --primary-60: #1d5940;
+        --primary-70: #1e674b;
+        --primary-80: #1e7755;
+        --primary-90: #1e8660;
+        --primary-100: #1e966b;
+        --primary-110: #45a37c;
+        --primary-120: #63b08d;
+        --primary-130: #7dbd9f;
+        --primary-140: #97cab1;
+        --primary-150: #b0d7c3;
+        --primary-160: #c9e3d6;
     }
 
     .dark {

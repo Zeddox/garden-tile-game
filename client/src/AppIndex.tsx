@@ -56,7 +56,7 @@ const GameList = () => {
                     {games?.map((x) => (
                         <div
                             className={
-                                'flex gap-2 p-1 pl-2 pr-2 items-center justify-between hover:shadow-slate-950 hover:shadow-sm hover:bg-emerald-800 rounded-sm group '
+                                'flex gap-2 p-1 pl-2 pr-2 items-center justify-between hover:shadow-slate-950 hover:shadow-sm hover:bg-primary rounded-sm group '
                             }
                             key={x.id}
                         >

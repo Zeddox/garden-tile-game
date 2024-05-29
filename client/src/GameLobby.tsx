@@ -16,7 +16,7 @@ export const GameLobby = () => {
 
     return (
         <div>
-            <div>{`Welcome to game ${game?.gameName} ${gameId}`}</div>
+            <h2 className={'text-3xl'}>{game?.gameName}</h2>
             <div className={'flex gap-2 items-center'}>
                 <Input placeholder={'Enter Player Name'} value={playerName} onChange={(ev) => setPlayerName(ev.target.value)} />
                 <Button

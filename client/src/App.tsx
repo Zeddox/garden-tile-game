@@ -13,7 +13,7 @@ export const App = () => {
                 <div className={'grid grid-cols-12 grid-rows-[48px_minmax(0px,_1fr)] [--primary-color:hsl(var(--primary))]'}>
                     <div
                         className={
-                            'flex w-full bg-[#1D5841] col-span-12 shadow-md shadow-[#152E23] border-t border-t-[#46A37D]/30 border-b border-b-[#1B4A37] pr-12 justify-between items-center'
+                            'flex w-full bg-[--primary-60] col-span-12 shadow-md shadow-[--primary-30] border-t border-t-[--primary-110]/30 border-b border-b-[--primary-50] pr-12 justify-between items-center'
                         }
                     >
                         <div className={'pl-12 h-full flex items-center'}>
@@ -22,7 +22,7 @@ export const App = () => {
                         <div className={'flex items-center gap-4'}>
                             <Link to={'/'} activeProps={{ className: 'hidden' }}>
                                 <Button variant={'ghost'} size={'sm'}>
-                                    {'Game List'}
+                                    {'< Game List'}
                                 </Button>
                             </Link>
                             <GameCreationButton />
