@@ -1,17 +1,16 @@
-import { useState } from 'react';
+import { Link } from '@tanstack/react-router';
 import './App.css';
-import { Button } from './components/ui/button';
-import { Input } from './components/ui/input';
 import { useCreateGame, useGames } from './services/gameApi';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { saveGameDataToSessionStorage } from './helpers';
-import { useConnectionContext } from './ConnectionProvider';
+import { GameCreationDialog } from './GameCreationDialog';
+import { Card } from './components/ui/card';
 
 export const AppIndex = () => {
+    const { data: games } = useGames();
+
     return (
-        <div className={'grid grid-cols-5 gap-4'}>
-            <GameList />
-            <GameCreation />
+        <div className={'grid grid-cols-10 gap-8'}>
+            {(games?.length ?? 0) > 0 ? <GameList /> : null}
+            <GameCreationDialog />
         </div>
     );
 };
@@ -20,50 +19,59 @@ const GameList = () => {
     const { data: games } = useGames();
 
     return (
-        <div className={'col-span-3'}>
-            {games?.map((x) => (
-                <div className={'flex gap-2 items-center'} key={x.id}>
-                    <span>{x.gameName}</span>
-                    <Link to={'/game/$gameId/lobby'} params={{ gameId: x.id }} className={'text-slate-500'}>
-                        {'Join'}
-                    </Link>
-                </div>
-            ))}
-        </div>
-    );
-};
-
-const GameCreation = () => {
-    const navigate = useNavigate();
-    const { connection } = useConnectionContext();
-    const { mutate: createGame, error } = useCreateGame();
-
-    const [gameName, setGameName] = useState('');
-    const [playerName, setPlayerName] = useState('');
-
-    const canCreateGame = gameName.length > 0 && playerName.length > 0;
-
-    return (
-        <div className={'col-span-2 flex flex-col gap-2'}>
-            <Input placeholder={'Enter Player Name'} value={playerName} onChange={(ev) => setPlayerName(ev.target.value)} />
-            <Input placeholder={'Enter Game Name'} value={gameName} onChange={(ev) => setGameName(ev.target.value)} />
-            <Button
-                onClick={() => {
-                    createGame(
-                        { gameName, playerName, playerConnectionId: connection.connectionId ?? '' },
-                        {
-                            onSuccess: (dto) => {
-                                //dto.players && saveGameDataToSessionStorage({ gameId: dto.id, playerId: dto.players[0].id })
-                                navigate({ to: `/game/$gameId/lobby`, params: { gameId: dto.id } });
-                            }
-                        }
-                    );
-                }}
-                disabled={!canCreateGame}
+        <>
+            <Card
+                className={
+                    'col-[2_/_6] flex flex-col gap-4 p-4  shadow-slate-950 shadow-md border-slate-700/40 bg-gradient-to-b from-slate-700/30 from-10% via-[#181b1a] via-60% to-[#181b1a] to-100%'
+                }
             >
-                {'Create Game'}
-            </Button>
-            {error !== undefined ? <div className={'text-red-800'}>{error?.message}</div> : null}
-        </div>
+                <h2 className={'text-2xl font-semibold text-slate-300'}>{'My Games'}</h2>
+                <div className={'flex flex-col gap-1a '}>
+                    {games?.map((x) => (
+                        <div
+                            className={
+                                'flex gap-2 p-1 pl-2 pr-2 items-center justify-between hover:shadow-slate-950 hover:shadow-sm hover:bg-emerald-800 rounded-sm group '
+                            }
+                            key={x.id}
+                        >
+                            <span>{x.gameName}</span>
+                            <Link
+                                to={'/game/$gameId/lobby'}
+                                params={{ gameId: x.id }}
+                                className={'text-slate-500 group-hover:text-slate-100'}
+                            >
+                                {'Join'}
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            </Card>
+            <Card
+                className={
+                    'col-[6_/_10] flex flex-col gap-4 p-4  shadow-slate-950 shadow-md border-slate-700/40 bg-gradient-to-b from-slate-700/30 from-10% via-[#181b1a] via-60% to-[#181b1a] to-100%'
+                }
+            >
+                <h2 className={'text-2xl font-semibold text-slate-300'}>{'Games to Join'}</h2>
+                <div className={'flex flex-col gap-1a '}>
+                    {games?.map((x) => (
+                        <div
+                            className={
+                                'flex gap-2 p-1 pl-2 pr-2 items-center justify-between hover:shadow-slate-950 hover:shadow-sm hover:bg-primary rounded-sm group '
+                            }
+                            key={x.id}
+                        >
+                            <span>{x.gameName}</span>
+                            <Link
+                                to={'/game/$gameId/lobby'}
+                                params={{ gameId: x.id }}
+                                className={'text-slate-500 group-hover:text-slate-100'}
+                            >
+                                {'Join'}
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            </Card>
+        </>
     );
 };

@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Input } from './components/ui/input';
 import { useGame, useGetPlayerByConnectionId, useUpdateGame, useUpdatePlayer } from './services/gameApi';
 import { getRouteApi } from '@tanstack/react-router';
 import { Button } from './components/ui/button';
 import { GameStatus } from './generated/backend';
-import { PlayerGameData } from './helpers';
-import { Badge } from './components/ui/badge'
+// import { PlayerGameData } from './helpers';
+// import { Badge } from './components/ui/badge'
 import { useConnectionContext } from './ConnectionProvider';
 const route = getRouteApi('/game/$gameId/lobby');
 
@@ -37,7 +37,7 @@ export const GameLobby = () => {
     
     return (
         <div>
-            <div>{`Welcome to game ${game?.gameName} ${gameId}`}</div>
+            <h2 className={'text-3xl'}>{game?.gameName}</h2>
             <div className={'flex gap-2 items-center'}>
                 <Input placeholder={'Enter Player Name'} value={playerName} onChange={(ev) => setPlayerName(ev.target.value)} />
                 <Button
@@ -50,37 +50,7 @@ export const GameLobby = () => {
 
             <div>
                 {game?.players?.map((player) => {
-                    return (
-                        <div>
-                            <div className={'flex gap-2 items-center my-5'}>
-                                <div>{player.name}</div>
-                                {currentPlayer?.id !== player.id ? (
-                                    <Badge variant={player.gameReady ? 'default' : 'secondary'}>{player.gameReady ? 'Ready' : 'Waiting...'}</Badge>
-                                ) : (
-                                    <div style={{ display: 'inline' }}>
-                                        <Button
-                                            variant='ghost'
-                                            disabled={player.gameReady}
-                                            onClick={() =>
-                                                updatePlayer({ id: player.id, gameId: player.gameId!, gameReady: true })
-                                            }
-                                        >
-                                            {'Ready'}
-                                        </Button>
-                                        <Button
-                                            variant='ghost'
-                                            disabled={!player.gameReady}
-                                            onClick={() =>
-                                                updatePlayer({ id: player.id, gameId: player.gameId!, gameReady: false })
-                                            }
-                                        >
-                                            {'Edit'}
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    );
+                    return <div key={player.id}>{player.name}</div>;
                 })}
             </div>
 
