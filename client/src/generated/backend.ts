@@ -202,6 +202,74 @@ export class ApiClient extends ApiClientBase {
         return Promise.resolve<void>(null as any);
     }
 
+    game_GetMyGames(gameIds: string[]): Promise<GameDto[]> {
+        let url_ = this.baseUrl + "/api/games/my-games";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(gameIds);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processGame_GetMyGames(_response);
+        });
+    }
+
+    protected processGame_GetMyGames(response: Response): Promise<GameDto[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(GameDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ValidationProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ProblemDetails.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<GameDto[]>(null as any);
+    }
+
     game_GetGameById(id: string): Promise<GameDto> {
         let url_ = this.baseUrl + "/api/games/{id}";
         if (id === undefined || id === null)
@@ -260,6 +328,197 @@ export class ApiClient extends ApiClientBase {
             });
         }
         return Promise.resolve<GameDto>(null as any);
+    }
+
+    game_GetPlayerByConnectionId(gameId: string, connectionId: string): Promise<PlayerDto> {
+        let url_ = this.baseUrl + "/api/games/{gameId}/players/{connectionId}";
+        if (gameId === undefined || gameId === null)
+            throw new Error("The parameter 'gameId' must be defined.");
+        url_ = url_.replace("{gameId}", encodeURIComponent("" + gameId));
+        if (connectionId === undefined || connectionId === null)
+            throw new Error("The parameter 'connectionId' must be defined.");
+        url_ = url_.replace("{connectionId}", encodeURIComponent("" + connectionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processGame_GetPlayerByConnectionId(_response);
+        });
+    }
+
+    protected processGame_GetPlayerByConnectionId(response: Response): Promise<PlayerDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PlayerDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ValidationProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ProblemDetails.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<PlayerDto>(null as any);
+    }
+
+    game_UpdatePlayer(dto: UpdatePlayerDto): Promise<void> {
+        let url_ = this.baseUrl + "/api/games/player";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processGame_UpdatePlayer(_response);
+        });
+    }
+
+    protected processGame_UpdatePlayer(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 204) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ValidationProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ProblemDetails.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    game_UpdatePlayersConnectionIds(connectionId: string, newConnectionId: string): Promise<PlayerDto[]> {
+        let url_ = this.baseUrl + "/api/games/players/{connectionId}";
+        if (connectionId === undefined || connectionId === null)
+            throw new Error("The parameter 'connectionId' must be defined.");
+        url_ = url_.replace("{connectionId}", encodeURIComponent("" + connectionId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(newConnectionId);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processGame_UpdatePlayersConnectionIds(_response);
+        });
+    }
+
+    protected processGame_UpdatePlayersConnectionIds(response: Response): Promise<PlayerDto[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(PlayerDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ValidationProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ProblemDetails.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<PlayerDto[]>(null as any);
     }
 }
 
@@ -357,6 +616,9 @@ export enum GameStatus {
 export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
     name?: string | undefined;
     gameId?: string;
+    gameReady?: boolean;
+    gameLeader?: boolean;
+    connectionId?: string | undefined;
 
     constructor(data?: IPlayerDto) {
         super(data);
@@ -367,6 +629,9 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
         if (_data) {
             this.name = _data["name"];
             this.gameId = _data["gameId"];
+            this.gameReady = _data["gameReady"];
+            this.gameLeader = _data["gameLeader"];
+            this.connectionId = _data["connectionId"];
         }
     }
 
@@ -381,6 +646,9 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["gameId"] = this.gameId;
+        data["gameReady"] = this.gameReady;
+        data["gameLeader"] = this.gameLeader;
+        data["connectionId"] = this.connectionId;
         super.toJSON(data);
         return data;
     }
@@ -389,6 +657,9 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
 export interface IPlayerDto extends IBaseDtoOfGuid {
     name?: string | undefined;
     gameId?: string;
+    gameReady?: boolean;
+    gameLeader?: boolean;
+    connectionId?: string | undefined;
 }
 
 export class ProblemDetails implements IProblemDetails {
@@ -572,6 +843,7 @@ export interface IValidationProblemDetails extends IHttpValidationProblemDetails
 export class CreateGameDto implements ICreateGameDto {
     gameName!: string;
     playerName!: string;
+    playerConnectionId!: string;
 
     constructor(data?: ICreateGameDto) {
         if (data) {
@@ -586,6 +858,7 @@ export class CreateGameDto implements ICreateGameDto {
         if (_data) {
             this.gameName = _data["gameName"];
             this.playerName = _data["playerName"];
+            this.playerConnectionId = _data["playerConnectionId"];
         }
     }
 
@@ -600,6 +873,7 @@ export class CreateGameDto implements ICreateGameDto {
         data = typeof data === 'object' ? data : {};
         data["gameName"] = this.gameName;
         data["playerName"] = this.playerName;
+        data["playerConnectionId"] = this.playerConnectionId;
         return data;
     }
 }
@@ -607,12 +881,14 @@ export class CreateGameDto implements ICreateGameDto {
 export interface ICreateGameDto {
     gameName: string;
     playerName: string;
+    playerConnectionId: string;
 }
 
 export class UpdateGameDto implements IUpdateGameDto {
     id!: string;
     gameStatus!: GameStatus;
     playerName?: string | undefined;
+    playerConnectionId?: string | undefined;
 
     constructor(data?: IUpdateGameDto) {
         if (data) {
@@ -628,6 +904,7 @@ export class UpdateGameDto implements IUpdateGameDto {
             this.id = _data["id"];
             this.gameStatus = _data["gameStatus"];
             this.playerName = _data["playerName"];
+            this.playerConnectionId = _data["playerConnectionId"];
         }
     }
 
@@ -643,6 +920,7 @@ export class UpdateGameDto implements IUpdateGameDto {
         data["id"] = this.id;
         data["gameStatus"] = this.gameStatus;
         data["playerName"] = this.playerName;
+        data["playerConnectionId"] = this.playerConnectionId;
         return data;
     }
 }
@@ -651,6 +929,51 @@ export interface IUpdateGameDto {
     id: string;
     gameStatus: GameStatus;
     playerName?: string | undefined;
+    playerConnectionId?: string | undefined;
+}
+
+export class UpdatePlayerDto implements IUpdatePlayerDto {
+    id!: string;
+    gameId!: string;
+    gameReady!: boolean;
+
+    constructor(data?: IUpdatePlayerDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.gameId = _data["gameId"];
+            this.gameReady = _data["gameReady"];
+        }
+    }
+
+    static fromJS(data: any): UpdatePlayerDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdatePlayerDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["gameId"] = this.gameId;
+        data["gameReady"] = this.gameReady;
+        return data;
+    }
+}
+
+export interface IUpdatePlayerDto {
+    id: string;
+    gameId: string;
+    gameReady: boolean;
 }
 
 export class ApiException extends Error {

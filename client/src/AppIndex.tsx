@@ -4,6 +4,8 @@ import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { useCreateGame, useGames } from './services/gameApi';
 import { Link, useNavigate } from '@tanstack/react-router';
+import { saveGameDataToSessionStorage } from './helpers';
+import { useConnectionContext } from './ConnectionProvider';
 
 export const AppIndex = () => {
     return (
@@ -33,6 +35,7 @@ const GameList = () => {
 
 const GameCreation = () => {
     const navigate = useNavigate();
+    const { connection } = useConnectionContext();
     const { mutate: createGame, error } = useCreateGame();
 
     const [gameName, setGameName] = useState('');
@@ -47,9 +50,10 @@ const GameCreation = () => {
             <Button
                 onClick={() => {
                     createGame(
-                        { gameName, playerName },
+                        { gameName, playerName, playerConnectionId: connection.connectionId ?? '' },
                         {
                             onSuccess: (dto) => {
+                                //dto.players && saveGameDataToSessionStorage({ gameId: dto.id, playerId: dto.players[0].id })
                                 navigate({ to: `/game/$gameId/lobby`, params: { gameId: dto.id } });
                             }
                         }
