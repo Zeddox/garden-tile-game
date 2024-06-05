@@ -16,17 +16,20 @@ export const GameLobby = () => {
 
     return (
         <div>
-            <div>{`Welcome to game ${game?.gameName} ${gameId}`}</div>
+            <h2 className={'text-3xl'}>{game?.gameName}</h2>
             <div className={'flex gap-2 items-center'}>
                 <Input placeholder={'Enter Player Name'} value={playerName} onChange={(ev) => setPlayerName(ev.target.value)} />
-                <Button disabled={playerName.length === 0} onClick={() => game && addPlayer({ id: game.id, gameStatus: game.gameStatus, playerName })}>
+                <Button
+                    disabled={playerName.length === 0}
+                    onClick={() => game && addPlayer({ id: game.id, gameStatus: game.gameStatus, playerName })}
+                >
                     {'Join'}
                 </Button>
             </div>
 
             <div>
                 {game?.players?.map((player) => {
-                    return <div>{player.name}</div>;
+                    return <div key={player.id}>{player.name}</div>;
                 })}
             </div>
         </div>
