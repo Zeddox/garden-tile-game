@@ -9,7 +9,7 @@ import { Button } from './components/ui/button';
 export const App = () => {
     return (
         <AppProvider>
-            <ThemeProvider defaultTheme='dark' storageKey='ui-theme'>
+            <ThemeProvider defaultTheme={'dark'} storageKey={'ui-theme'}>
                 <div className={'grid grid-cols-12 grid-rows-[48px_minmax(0px,_1fr)] [--primary-color:hsl(var(--primary))]'}>
                     <div
                         className={
