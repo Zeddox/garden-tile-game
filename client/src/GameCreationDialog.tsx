@@ -32,7 +32,7 @@ export const GameCreationDialog = () => {
                 <Input placeholder={'Enter Game Name'} value={gameName} onChange={(ev) => setGameName(ev.target.value)} />
 
                 {error !== undefined ? <div className={'text-red-800'}>{error?.message}</div> : null}
-                <DialogFooter className='justify-end'>
+                <DialogFooter className={'justify-end'}>
                     <Button
                         onClick={() => {
                             createGame(
@@ -50,7 +50,7 @@ export const GameCreationDialog = () => {
                         {'Create Game'}
                     </Button>
                     <DialogClose asChild>
-                        <Button type='button' variant='secondary'>
+                        <Button type={'button'} variant={'secondary'}>
                             {'Close'}
                         </Button>
                     </DialogClose>
