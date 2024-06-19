@@ -6,4 +6,7 @@ public interface IGameClient
 {
     Task NotifyGameCreated(GameDto game);
     Task NotifyPlayerAdded(PlayerDto player);
+    Task NotifyGameStart(string gameId);
+    Task NotifyPlayerUpdated(PlayerDto player);
+    Task NotifyPlayersConnectionIdUpdated(IEnumerable<UpdatePlayerConnectionIdDto> players);
 }

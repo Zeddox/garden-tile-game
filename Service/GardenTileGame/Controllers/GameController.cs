@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Numerics;
 
 namespace GardenTileGame.API.Controllers;
 
@@ -47,7 +48,10 @@ public class GameController : BaseController
                 new Player
                 {
                     Id = Guid.NewGuid(),
-                    Name = dto.PlayerName
+                    Name = dto.PlayerName,
+                    UserId = Guid.Parse(dto.UserId),
+                    GameLeader = true,
+                    GameReady = true
                 }
             }
         };
@@ -55,6 +59,7 @@ public class GameController : BaseController
         _db.Games.Add(game);
         await _db.SaveChangesAsync(cancellationToken);
 
+        await _gameHubContext.Groups.AddToGroupAsync(dto.ConnectionId, game.Id.ToString(), cancellationToken);
         await _gameHubContext.Clients.All.NotifyGameCreated(game.ToDto());
 
         return CreatedAtAction(nameof(CreateNewGame), game.ToDto());
@@ -70,13 +75,39 @@ public class GameController : BaseController
     public async Task<ActionResult<IEnumerable<GameDto>>> GetAllJoinableGames(CancellationToken cancellationToken)
     {
         var games = await _db.Games
-            .Where(x => x.GameStatus == GameStatus.Setup)
+            //.Where(x => x.GameStatus == GameStatus.Setup)
             .Select(x => x.ToDto())
-            .ToListAsync(cancellationToken);
+            .ToListAsync(cancellationToken) ?? new List<GameDto>();
+
+        foreach (var game in games)
+        {
+            var players = await _db.Players
+                .Where(x => x.GameId == game.Id)
+                .ToListAsync(cancellationToken);
+
+            game.Players = players.Select(x => x.ToDto()).ToList();
+        }
+
 
         return Ok(games);
     }
 
+    /// <summary>
+    /// Get a list of games the user is playing
+    /// </summary>
+    /// <param name="gameIds">A list of Game Ids</param>
+    [HttpGet("user/{userId}/my-games")]
+    [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Get))]
+    public async Task<ActionResult<IEnumerable<GameDto>>> GetMyGames(Guid userId, CancellationToken cancellationToken)
+    {
+        var games = (await _db.Players
+            .Include(x => x.Game)
+            .Where(x => x.UserId == userId)
+            .ToListAsync(cancellationToken))
+            .Select(x => x.Game.ToDto());
+
+        return Ok(games);
+    }
     /// <summary>
     /// Get Game by ID
     /// </summary>
@@ -85,7 +116,8 @@ public class GameController : BaseController
     [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Get))]
     public async Task<ActionResult<GameDto>> GetGameById(Guid id, CancellationToken cancellationToken)
     {
-        var game = await _db.Games.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var game = await _db.Games
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         if (game == null)
         {
@@ -93,7 +125,23 @@ public class GameController : BaseController
 
         }
 
+        var players = await _db.Players
+            .Where(x => x.GameId == id)
+            .ToListAsync(cancellationToken);
+
+        game.Players = players;
+
         return Ok(game.ToDto());
+    }
+
+    [HttpGet("users")]
+    [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Get))]
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers(CancellationToken cancellationToken)
+    {
+        var userDtos = (await _db.Users.ToListAsync(cancellationToken))
+            .Select(x => x.ToDto());
+
+        return Ok(userDtos);
     }
 
     /// <summary>
@@ -112,11 +160,12 @@ public class GameController : BaseController
             throw new Exception($"Game {dto.Id} could not be found");
         }
 
-        if (!string.IsNullOrEmpty(dto.PlayerName))
+        if (!string.IsNullOrEmpty(dto.UserId))
         {
             var player = new Player
             {
                 Id = Guid.NewGuid(),
+                UserId = Guid.Parse(dto.UserId),
                 Name = dto.PlayerName
             };
 
@@ -125,13 +174,49 @@ public class GameController : BaseController
             var playerDto = player.ToDto();
             playerDto.GameId = game.Id;
 
-            await _gameHubContext.Clients.All.NotifyPlayerAdded(playerDto);
+            await _gameHubContext.Groups.AddToGroupAsync(dto.ConnectionId, game.Id.ToString(), cancellationToken);
+            await _gameHubContext.Clients.Group(game.Id.ToString()).NotifyPlayerAdded(playerDto);
         }
 
-        game.GameStatus = dto.GameStatus;
+        if (dto.GameStatus != game.GameStatus)
+        {
+            game.GameStatus = dto.GameStatus;
+
+            if (game.GameStatus == GameStatus.InProgress)
+            {
+                await _gameHubContext.Clients.Group(game.Id.ToString()).NotifyGameStart(game.Id.ToString());
+            }
+        }
 
         _db.Games.Update(game);
         await _db.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Create a new Game.
+    /// Client is notified of Game creation via SignalR
+    /// </summary>
+    /// <param name="dto">A Game DTO.</param>
+    [HttpPut("player")]
+    [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Put))]
+    public async Task<ActionResult> UpdatePlayer([FromBody] UpdatePlayerDto dto, CancellationToken cancellationToken)
+    {
+        var player = await _db.Players
+            .FirstOrDefaultAsync(x => x.Id == Guid.Parse(dto.Id), cancellationToken);
+
+        if (player == null)
+        {
+            throw new Exception($"Player with ID {dto.Id} could not be found");
+        }
+
+        player.GameReady = dto.GameReady;
+
+        _db.Players.Update(player);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        await _gameHubContext.Clients.Group(player.GameId.ToString()).NotifyPlayerUpdated(player.ToDto());
 
         return Ok();
     }

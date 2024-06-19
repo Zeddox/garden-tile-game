@@ -21,6 +21,11 @@ public class CreateGameDto
 
     [Required]
     public string PlayerName { get; set; }
+
+    [Required]
+    public string UserId { get; set; }
+
+    public string ConnectionId { get; set; }
 }
 
 public class UpdateGameDto
@@ -30,4 +35,6 @@ public class UpdateGameDto
     [Required]
     public GameStatus GameStatus { get; set; }
     public string PlayerName { get; set; }
+    public string UserId { get; set; }
+    public string ConnectionId { get; set; }
 }

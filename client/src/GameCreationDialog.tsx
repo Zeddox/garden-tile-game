@@ -7,9 +7,13 @@ import { Button } from './components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader } from './components/ui/dialog';
 import { Input } from './components/ui/input';
 import { useCreateGame } from './services/gameApi';
+import { useSelectedUser } from './useSelectedUser';
+import { useConnectionContext } from './ConnectionProvider';
 
 export const GameCreationDialog = () => {
     const navigate = useNavigate();
+    const selectedUser = useSelectedUser();
+    const { connection } = useConnectionContext();
     const { mutate: createGame, error } = useCreateGame();
     const [showDialog, setShowDialog] = useAtom(useContext(AppContext)!.showGameCreationDialogAtom);
 
@@ -32,7 +36,7 @@ export const GameCreationDialog = () => {
                     <Button
                         onClick={() => {
                             createGame(
-                                { gameName, playerName },
+                                { gameName, playerName, userId: selectedUser!.id, connectionId: connection.connectionId! },
                                 {
                                     onSuccess: (dto) => {
                                         setShowDialog(false);

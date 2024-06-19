@@ -202,6 +202,73 @@ export class ApiClient extends ApiClientBase {
         return Promise.resolve<void>(null as any);
     }
 
+    game_GetMyGames(userId: string): Promise<GameDto[]> {
+        let url_ = this.baseUrl + "/api/games/user/{userId}/my-games";
+        if (userId === undefined || userId === null)
+            throw new Error("The parameter 'userId' must be defined.");
+        url_ = url_.replace("{userId}", encodeURIComponent("" + userId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processGame_GetMyGames(_response);
+        });
+    }
+
+    protected processGame_GetMyGames(response: Response): Promise<GameDto[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(GameDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ValidationProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ProblemDetails.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<GameDto[]>(null as any);
+    }
+
     game_GetGameById(id: string): Promise<GameDto> {
         let url_ = this.baseUrl + "/api/games/{id}";
         if (id === undefined || id === null)
@@ -260,6 +327,127 @@ export class ApiClient extends ApiClientBase {
             });
         }
         return Promise.resolve<GameDto>(null as any);
+    }
+
+    game_GetAllUsers(): Promise<UserDto[]> {
+        let url_ = this.baseUrl + "/api/games/users";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processGame_GetAllUsers(_response);
+        });
+    }
+
+    protected processGame_GetAllUsers(response: Response): Promise<UserDto[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(UserDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return result200;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ValidationProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ProblemDetails.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<UserDto[]>(null as any);
+    }
+
+    game_UpdatePlayer(dto: UpdatePlayerDto): Promise<void> {
+        let url_ = this.baseUrl + "/api/games/player";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processGame_UpdatePlayer(_response);
+        });
+    }
+
+    protected processGame_UpdatePlayer(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 204) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ValidationProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ProblemDetails.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<void>(null as any);
     }
 }
 
@@ -357,6 +545,9 @@ export enum GameStatus {
 export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
     name?: string | undefined;
     gameId?: string;
+    userId?: string;
+    gameReady?: boolean;
+    gameLeader?: boolean;
 
     constructor(data?: IPlayerDto) {
         super(data);
@@ -367,6 +558,9 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
         if (_data) {
             this.name = _data["name"];
             this.gameId = _data["gameId"];
+            this.userId = _data["userId"];
+            this.gameReady = _data["gameReady"];
+            this.gameLeader = _data["gameLeader"];
         }
     }
 
@@ -381,6 +575,9 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["gameId"] = this.gameId;
+        data["userId"] = this.userId;
+        data["gameReady"] = this.gameReady;
+        data["gameLeader"] = this.gameLeader;
         super.toJSON(data);
         return data;
     }
@@ -389,6 +586,9 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
 export interface IPlayerDto extends IBaseDtoOfGuid {
     name?: string | undefined;
     gameId?: string;
+    userId?: string;
+    gameReady?: boolean;
+    gameLeader?: boolean;
 }
 
 export class ProblemDetails implements IProblemDetails {
@@ -572,6 +772,8 @@ export interface IValidationProblemDetails extends IHttpValidationProblemDetails
 export class CreateGameDto implements ICreateGameDto {
     gameName!: string;
     playerName!: string;
+    userId!: string;
+    connectionId?: string | undefined;
 
     constructor(data?: ICreateGameDto) {
         if (data) {
@@ -586,6 +788,8 @@ export class CreateGameDto implements ICreateGameDto {
         if (_data) {
             this.gameName = _data["gameName"];
             this.playerName = _data["playerName"];
+            this.userId = _data["userId"];
+            this.connectionId = _data["connectionId"];
         }
     }
 
@@ -600,6 +804,8 @@ export class CreateGameDto implements ICreateGameDto {
         data = typeof data === 'object' ? data : {};
         data["gameName"] = this.gameName;
         data["playerName"] = this.playerName;
+        data["userId"] = this.userId;
+        data["connectionId"] = this.connectionId;
         return data;
     }
 }
@@ -607,12 +813,246 @@ export class CreateGameDto implements ICreateGameDto {
 export interface ICreateGameDto {
     gameName: string;
     playerName: string;
+    userId: string;
+    connectionId?: string | undefined;
+}
+
+export class UserDto extends BaseDtoOfGuid implements IUserDto {
+    name!: string;
+    players?: Player[];
+
+    constructor(data?: IUserDto) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.name = _data["name"];
+            if (Array.isArray(_data["players"])) {
+                this.players = [] as any;
+                for (let item of _data["players"])
+                    this.players!.push(Player.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): UserDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserDto();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        if (Array.isArray(this.players)) {
+            data["players"] = [];
+            for (let item of this.players)
+                data["players"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IUserDto extends IBaseDtoOfGuid {
+    name: string;
+    players?: Player[];
+}
+
+export abstract class BaseModelOfGuid implements IBaseModelOfGuid {
+    id?: string;
+
+    constructor(data?: IBaseModelOfGuid) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): BaseModelOfGuid {
+        data = typeof data === 'object' ? data : {};
+        throw new Error("The abstract class 'BaseModelOfGuid' cannot be instantiated.");
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IBaseModelOfGuid {
+    id?: string;
+}
+
+export class Player extends BaseModelOfGuid implements IPlayer {
+    name!: string;
+    gameId?: string;
+    game?: Game | undefined;
+    userId?: string;
+    user?: User | undefined;
+    gameReady?: boolean;
+    gameLeader?: boolean;
+
+    constructor(data?: IPlayer) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.name = _data["name"];
+            this.gameId = _data["gameId"];
+            this.game = _data["game"] ? Game.fromJS(_data["game"]) : <any>undefined;
+            this.userId = _data["userId"];
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : <any>undefined;
+            this.gameReady = _data["gameReady"];
+            this.gameLeader = _data["gameLeader"];
+        }
+    }
+
+    static override fromJS(data: any): Player {
+        data = typeof data === 'object' ? data : {};
+        let result = new Player();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["gameId"] = this.gameId;
+        data["game"] = this.game ? this.game.toJSON() : <any>undefined;
+        data["userId"] = this.userId;
+        data["user"] = this.user ? this.user.toJSON() : <any>undefined;
+        data["gameReady"] = this.gameReady;
+        data["gameLeader"] = this.gameLeader;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IPlayer extends IBaseModelOfGuid {
+    name: string;
+    gameId?: string;
+    game?: Game | undefined;
+    userId?: string;
+    user?: User | undefined;
+    gameReady?: boolean;
+    gameLeader?: boolean;
+}
+
+export class Game extends BaseModelOfGuid implements IGame {
+    gameName!: string;
+    gameStatus!: GameStatus;
+    players?: Player[] | undefined;
+
+    constructor(data?: IGame) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.gameName = _data["gameName"];
+            this.gameStatus = _data["gameStatus"];
+            if (Array.isArray(_data["players"])) {
+                this.players = [] as any;
+                for (let item of _data["players"])
+                    this.players!.push(Player.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): Game {
+        data = typeof data === 'object' ? data : {};
+        let result = new Game();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["gameName"] = this.gameName;
+        data["gameStatus"] = this.gameStatus;
+        if (Array.isArray(this.players)) {
+            data["players"] = [];
+            for (let item of this.players)
+                data["players"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IGame extends IBaseModelOfGuid {
+    gameName: string;
+    gameStatus: GameStatus;
+    players?: Player[] | undefined;
+}
+
+export class User extends BaseModelOfGuid implements IUser {
+    name!: string;
+    players?: Player[];
+
+    constructor(data?: IUser) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.name = _data["name"];
+            if (Array.isArray(_data["players"])) {
+                this.players = [] as any;
+                for (let item of _data["players"])
+                    this.players!.push(Player.fromJS(item));
+            }
+        }
+    }
+
+    static override fromJS(data: any): User {
+        data = typeof data === 'object' ? data : {};
+        let result = new User();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        if (Array.isArray(this.players)) {
+            data["players"] = [];
+            for (let item of this.players)
+                data["players"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IUser extends IBaseModelOfGuid {
+    name: string;
+    players?: Player[];
 }
 
 export class UpdateGameDto implements IUpdateGameDto {
     id!: string;
     gameStatus!: GameStatus;
     playerName?: string | undefined;
+    userId?: string | undefined;
+    connectionId?: string | undefined;
 
     constructor(data?: IUpdateGameDto) {
         if (data) {
@@ -628,6 +1068,8 @@ export class UpdateGameDto implements IUpdateGameDto {
             this.id = _data["id"];
             this.gameStatus = _data["gameStatus"];
             this.playerName = _data["playerName"];
+            this.userId = _data["userId"];
+            this.connectionId = _data["connectionId"];
         }
     }
 
@@ -643,6 +1085,8 @@ export class UpdateGameDto implements IUpdateGameDto {
         data["id"] = this.id;
         data["gameStatus"] = this.gameStatus;
         data["playerName"] = this.playerName;
+        data["userId"] = this.userId;
+        data["connectionId"] = this.connectionId;
         return data;
     }
 }
@@ -651,6 +1095,52 @@ export interface IUpdateGameDto {
     id: string;
     gameStatus: GameStatus;
     playerName?: string | undefined;
+    userId?: string | undefined;
+    connectionId?: string | undefined;
+}
+
+export class UpdatePlayerDto implements IUpdatePlayerDto {
+    id!: string;
+    gameId!: string;
+    gameReady!: boolean;
+
+    constructor(data?: IUpdatePlayerDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.gameId = _data["gameId"];
+            this.gameReady = _data["gameReady"];
+        }
+    }
+
+    static fromJS(data: any): UpdatePlayerDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdatePlayerDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["gameId"] = this.gameId;
+        data["gameReady"] = this.gameReady;
+        return data;
+    }
+}
+
+export interface IUpdatePlayerDto {
+    id: string;
+    gameId: string;
+    gameReady: boolean;
 }
 
 export class ApiException extends Error {

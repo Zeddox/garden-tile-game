@@ -1,9 +1,15 @@
-import { ApiClient, CreateGameDto, ICreateGameDto, IGameDto, IUpdateGameDto, UpdateGameDto } from '@/generated/backend';
+import { ApiClient, CreateGameDto, ICreateGameDto, IGameDto, IUpdateGameDto, IUpdatePlayerDto, UpdateGameDto, UpdatePlayerDto } from '@/generated/backend';
 import { useMutation, useQuery } from '@tanstack/react-query';
+
+export interface ConnectionIdDto  {
+    oldConnectionId: string;
+    newConnectionId: string;
+}
 
 export const gameApiQueryKeys = {
     games: ['games'],
-    game: (id:string ) => ['game', id]
+    game: (id:string ) => ['game', id],
+    playerByConnectionId: (id: string, gameId: string) => ['player', { id, gameId }]
 };
 
 export const useGames = () => {
@@ -30,4 +36,10 @@ export const useUpdateGame = () => {
     return useMutation<void, Error, IUpdateGameDto>({
         mutationFn: (dto) => new ApiClient('http://localhost:8020').game_UpdateGame(dto as UpdateGameDto)
     });
-}
+};
+
+export const useUpdatePlayer = () => {
+    return useMutation<void, Error, IUpdatePlayerDto>({
+        mutationFn: (dto) => new ApiClient('http://localhost:8020').game_UpdatePlayer(dto as UpdatePlayerDto)
+    });
+};

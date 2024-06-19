@@ -5,6 +5,7 @@ import { AppProvider } from './AppProvider';
 import { GameCreationButton } from './GameCreationButton';
 import { ThemeProvider } from './components/theme-provider';
 import { Button } from './components/ui/button';
+import { UserSelection } from './UserSelection';
 
 export const App = () => {
     return (
@@ -26,6 +27,7 @@ export const App = () => {
                                 </Button>
                             </Link>
                             <GameCreationButton />
+                            <UserSelection/>
                         </div>
                     </div>
                     <div className={'col-span-10 col-start-2 p-6'}>

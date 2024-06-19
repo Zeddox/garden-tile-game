@@ -2,6 +2,7 @@
 
 using GardenTileGame.Data.DTOs;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GardenTileGame.Data.Models;
 public class Player : BaseModel<Guid>
@@ -11,6 +12,17 @@ public class Player : BaseModel<Guid>
 
     public Guid GameId { get; set; }
 
+    [ForeignKey(nameof(GameId))]
+    public virtual Game Game { get; set; }
+
+    public Guid UserId { get; set; }
+
+    [ForeignKey(nameof(UserId))]
+    public virtual User User { get; set; }
+
+    public bool GameReady { get; set; }
+
+    public bool GameLeader { get; set; }
 }
 
 public static class PlayerExtensions
@@ -21,7 +33,10 @@ public static class PlayerExtensions
         {
             Id = player.Id,
             Name = player.Name,
-            GameId = player.GameId
+            UserId = player.UserId,
+            GameId = player.GameId,
+            GameReady = player.GameReady,
+            GameLeader = player.GameLeader
         };
     }
 }
