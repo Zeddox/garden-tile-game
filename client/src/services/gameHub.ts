@@ -1,10 +1,9 @@
 import { QueryClient } from '@tanstack/react-query';
 import * as signalR from '@microsoft/signalr';
-import { GameDto, IGameDto, IPlayerDto, PlayerDto } from '@/generated/backend';
+import { GameDto, IGameDto, PlayerDto } from '@/generated/backend';
 import { gameApiQueryKeys } from './gameApi';
 import { AnyRoute, Router } from '@tanstack/react-router';
 import { TrailingSlashOption } from 'node_modules/@tanstack/react-router/dist/esm/router';
-import { saveGameDataToSessionStorage } from '@/helpers';
 
 export const connectToGameHub = (queryClient: QueryClient, router: Router<AnyRoute, TrailingSlashOption, Record<string, any>, Record<string, any>>) => {
     const connection = new signalR.HubConnectionBuilder()
@@ -42,12 +41,7 @@ export const connectToGameHub = (queryClient: QueryClient, router: Router<AnyRou
         queryClient.setQueryData<IGameDto>(gameApiQueryKeys.game(player.gameId!), (prev) => {
 
             const next = prev ? { ...prev } : new GameDto();
-console.log({next, prev})
-            // next.players?.forEach(x => {
-            //     if (x.id === player.id) {
-            //         x.gameReady = player.gameReady;
-            //     }
-            // });
+            console.log({next, prev})
 
             next.players = next.players?.map(x => ({...x, gameReady: player.gameReady}) as PlayerDto) ?? []
 

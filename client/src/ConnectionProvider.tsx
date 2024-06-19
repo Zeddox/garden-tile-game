@@ -1,6 +1,5 @@
 import { HubConnection } from '@microsoft/signalr';
-import React, { useEffect, useMemo } from 'react';
-//import { useUpdatePlayerConnectionId } from './services/gameApi';
+import React, { useMemo } from 'react';
 
 export interface IConnectionContext {
     connection: HubConnection;
@@ -25,21 +24,6 @@ export const useConnectionContext = () => {
     if (context === undefined) {
         throw Error('No context for a connection found. Ensure component tree is wrapped in ConnectionProvider');
     }
-
-    //const { mutate: updateConnectionId } = useUpdatePlayerConnectionId();
-    
-    // useEffect(() => {
-    //     if (context.connection.connectionId !== null) {
-    //         var oldConnectionId = sessionStorage.getItem('connectionId');
-    //         var newConnectionId = context.connection.connectionId;
-
-    //         if (oldConnectionId && oldConnectionId !== newConnectionId) {
-    //             updateConnectionId({ oldConnectionId: oldConnectionId, newConnectionId: newConnectionId })
-    //         }
-
-    //         sessionStorage.setItem('connectionId', context.connection.connectionId ?? '')
-    //     }
-    // }, [context.connection]);
 
     return context;
 };

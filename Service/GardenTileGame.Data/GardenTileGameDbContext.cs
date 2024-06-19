@@ -43,11 +43,4 @@ public class GardenTileGameDbContext : DbContext
     {
         optionsBuilder.EnableDetailedErrors();
     }
-
-    //public void EnsureSeedData()
-    //{
-    //    if (Users)
-    //    var users = new List<string> { "Andrew", "Brandon", "Brooks", "Aaron" };
-
-    //}
 }
