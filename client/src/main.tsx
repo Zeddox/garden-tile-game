@@ -6,7 +6,8 @@ import './index.css';
 import { routeTree } from './routeTree.gen';
 import { connectToGameHub } from './services/gameHub.ts';
 import { ConnectionProvider } from './ConnectionProvider.tsx';
-import { useUpdatePlayerConnectionId } from './services/gameApi.ts';
+import { SELECTED_USER_ID_KEY } from './appContext.ts';
+//import { useUpdatePlayerConnectionId } from './services/gameApi.ts';
 
 const queryClient = new QueryClient();
 
@@ -23,16 +24,10 @@ const gameHubConnection = connectToGameHub(queryClient, router);
 gameHubConnection
     .start()
     .then(() => {
-        // if (gameHubConnection.connectionId) {
-        //     var oldConnectionId = sessionStorage.getItem('connectionId');
-        //     var newConnectionId = gameHubConnection.connectionId;
-
-        //     if (oldConnectionId) {
-        //         updateConnectionId({ oldConnectionId: oldConnectionId, newConnectionId: newConnectionId })
-        //     }
-
-        //     sessionStorage.setItem('connectionId', gameHubConnection.connectionId ?? '')
-        // }
+        const storedSelectedUserId = JSON.parse(window.sessionStorage.getItem(SELECTED_USER_ID_KEY) ?? JSON.stringify(null)) as string | null
+        if (storedSelectedUserId) {
+            gameHubConnection.send("NewConnectionMade", storedSelectedUserId);
+        }
         console.log('connected to game hub')
     })
     .catch((reason) => console.log('unable to connect to game hub', { reason }));

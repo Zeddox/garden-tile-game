@@ -1,24 +1,36 @@
 import { Link } from '@tanstack/react-router';
 import './App.css';
-import { useCreateGame, useGames } from './services/gameApi';
+import { useGames } from './services/gameApi';
 import { GameCreationDialog } from './GameCreationDialog';
 import { Card } from './components/ui/card';
+import { useAtomValue } from 'jotai';
+import { useContext } from 'react';
+import { AppContext } from './appContext';
+import { GameStatus } from './generated/backend';
 
 export const AppIndex = () => {
-    const { data: games } = useGames();
+    const selectedUserId = useAtomValue(useContext(AppContext)!.selectedUserIdAtom);
 
     return (
         <div className={'grid grid-cols-10 gap-8'}>
-            {(games?.length ?? 0) > 0 ? <GameList /> : null}
-            <GameCreationDialog />
+            {selectedUserId !== undefined ? (
+                <>
+                    <GameList />
+                    <GameCreationDialog />
+                </>
+            ) : (
+                <h2 className={'text-2xl font-semibold text-slate-300'}>{'Select a user to begin ↑'}</h2>
+            )}
         </div>
     );
 };
 
 const GameList = () => {
+    const selectedUserId = useAtomValue(useContext(AppContext)!.selectedUserIdAtom);
     const { data: games } = useGames();
 
-    return (
+
+    return (games?.length ?? 0) > 0 ? (
         <>
             <Card
                 className={
@@ -26,24 +38,26 @@ const GameList = () => {
                 }
             >
                 <h2 className={'text-2xl font-semibold text-slate-300'}>{'My Games'}</h2>
-                <div className={'flex flex-col gap-1a '}>
-                    {games?.map((x) => (
-                        <div
-                            className={
-                                'flex gap-2 p-1 pl-2 pr-2 items-center justify-between hover:shadow-slate-950 hover:shadow-sm hover:bg-emerald-800 rounded-sm group '
-                            }
-                            key={x.id}
-                        >
-                            <span>{x.gameName}</span>
-                            <Link
-                                to={'/game/$gameId/lobby'}
-                                params={{ gameId: x.id }}
-                                className={'text-slate-500 group-hover:text-slate-100'}
+                <div className={'flex flex-col gap-1'}>
+                    {games
+                        ?.filter((x) => x.players?.find((x) => (x.userId === selectedUserId)) !== undefined)
+                        ?.map((x) => (
+                            <div
+                                className={
+                                    'flex gap-2 p-1 pl-2 pr-2 items-center justify-between hover:shadow-slate-950 hover:shadow-sm hover:bg-emerald-800 rounded-sm group '
+                                }
+                                key={x.id}
                             >
-                                {'Join'}
-                            </Link>
-                        </div>
-                    ))}
+                                <span>{x.gameName}</span>
+                                <Link
+                                    to={x.gameStatus === GameStatus.Setup ? '/game/$gameId/lobby' : '/game/$gameId/room'}
+                                    params={{ gameId: x.id }}
+                                    className={'text-slate-500 group-hover:text-slate-100'}
+                                >
+                                    {`Enter ${x.gameStatus === GameStatus.Setup ? 'Game Lobby' : 'Game Room'}`}
+                                </Link>
+                            </div>
+                        ))}
                 </div>
             </Card>
             <Card
@@ -52,26 +66,28 @@ const GameList = () => {
                 }
             >
                 <h2 className={'text-2xl font-semibold text-slate-300'}>{'Games to Join'}</h2>
-                <div className={'flex flex-col gap-1a '}>
-                    {games?.map((x) => (
-                        <div
-                            className={
-                                'flex gap-2 p-1 pl-2 pr-2 items-center justify-between hover:shadow-slate-950 hover:shadow-sm hover:bg-primary rounded-sm group '
-                            }
-                            key={x.id}
-                        >
-                            <span>{x.gameName}</span>
-                            <Link
-                                to={'/game/$gameId/lobby'}
-                                params={{ gameId: x.id }}
-                                className={'text-slate-500 group-hover:text-slate-100'}
+                <div className={'flex flex-col gap-1'}>
+                    {games
+                        ?.filter((x) => x.players?.find((x) => (x.userId === selectedUserId)) === undefined)
+                        ?.map((x) => (
+                            <div
+                                className={
+                                    'flex gap-2 p-1 pl-2 pr-2 items-center justify-between hover:shadow-slate-950 hover:shadow-sm hover:bg-primary rounded-sm group '
+                                }
+                                key={x.id}
                             >
-                                {'Join'}
-                            </Link>
-                        </div>
-                    ))}
+                                <span>{x.gameName}</span>
+                                <Link
+                                    to={'/game/$gameId/lobby'}
+                                    params={{ gameId: x.id }}
+                                    className={'text-slate-500 group-hover:text-slate-100'}
+                                >
+                                    {'Join'}
+                                </Link>
+                            </div>
+                        ))}
                 </div>
             </Card>
         </>
-    );
+    ) : null;
 };

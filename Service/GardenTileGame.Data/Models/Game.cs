@@ -13,7 +13,7 @@ public class Game : BaseModel<Guid>
     [Required]
     public GameStatus GameStatus { get; set; }
 
-    public IList<Player> Players { get; set; }
+    public virtual IList<Player> Players { get; set; }
 }
 
 public static class GameExtensions

@@ -26,13 +26,13 @@ export const useGame = (id:string) => {
     });
 };
 
-export const useGetPlayerByConnectionId = (gameId:string, connectionId:string | undefined) => {
-    return useQuery<IPlayerDto>({
-        queryKey: gameApiQueryKeys.playerByConnectionId(connectionId!, gameId),
-        queryFn: () => new ApiClient('http://localhost:8020').game_GetPlayerByConnectionId(gameId, connectionId!),
-        enabled: gameId !== undefined && connectionId !== undefined
-    });
-};
+// export const useGetPlayerByConnectionId = (gameId:string, connectionId:string | undefined) => {
+//     return useQuery<IPlayerDto>({
+//         queryKey: gameApiQueryKeys.playerByConnectionId(connectionId!, gameId),
+//         queryFn: () => new ApiClient('http://localhost:8020').game_GetPlayerByConnectionId(gameId, connectionId!),
+//         enabled: gameId !== undefined && connectionId !== undefined
+//     });
+// };
 
 export const useCreateGame = () => {
     return useMutation<IGameDto, Error, ICreateGameDto>({
@@ -52,8 +52,8 @@ export const useUpdatePlayer = () => {
     });
 }
 
-export const useUpdatePlayerConnectionId = () => {
-    return useMutation<IPlayerDto[], Error, ConnectionIdDto>({
-        mutationFn: (dto) => new ApiClient('http://localhost:8020').game_UpdatePlayersConnectionIds(dto.oldConnectionId, dto.newConnectionId)
-    });
-}
+// export const useUpdatePlayerConnectionId = () => {
+//     return useMutation<IPlayerDto[], Error, ConnectionIdDto>({
+//         mutationFn: (dto) => new ApiClient('http://localhost:8020').game_UpdatePlayersConnectionIds(dto.oldConnectionId, dto.newConnectionId)
+//     });
+// }

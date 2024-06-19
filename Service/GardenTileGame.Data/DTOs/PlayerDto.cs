@@ -8,9 +8,9 @@ public class PlayerDto: BaseDto<Guid>
 {
     public string Name { get; set; }
     public Guid GameId { get; set; }
+    public Guid UserId { get; set; }
     public bool GameReady { get; set; }
     public bool GameLeader { get; set; }
-    public string ConnectionId { get; set; }
 }
 
 public class UpdatePlayerDto

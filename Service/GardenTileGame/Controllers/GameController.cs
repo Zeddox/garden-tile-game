@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Numerics;
 
 namespace GardenTileGame.API.Controllers;
 
@@ -48,9 +49,9 @@ public class GameController : BaseController
                 {
                     Id = Guid.NewGuid(),
                     Name = dto.PlayerName,
+                    UserId = Guid.Parse(dto.UserId),
                     GameLeader = true,
-                    GameReady = true,
-                    ConnectionId = dto.PlayerConnectionId
+                    GameReady = true
                 }
             }
         };
@@ -58,7 +59,7 @@ public class GameController : BaseController
         _db.Games.Add(game);
         await _db.SaveChangesAsync(cancellationToken);
 
-        await _gameHubContext.Groups.AddToGroupAsync(game.Players.First().ConnectionId, game.Id.ToString(), cancellationToken);
+        await _gameHubContext.Groups.AddToGroupAsync(dto.ConnectionId, game.Id.ToString(), cancellationToken);
         await _gameHubContext.Clients.All.NotifyGameCreated(game.ToDto());
 
         return CreatedAtAction(nameof(CreateNewGame), game.ToDto());
@@ -74,9 +75,19 @@ public class GameController : BaseController
     public async Task<ActionResult<IEnumerable<GameDto>>> GetAllJoinableGames(CancellationToken cancellationToken)
     {
         var games = await _db.Games
-            .Where(x => x.GameStatus == GameStatus.Setup)
+            //.Where(x => x.GameStatus == GameStatus.Setup)
             .Select(x => x.ToDto())
             .ToListAsync(cancellationToken) ?? new List<GameDto>();
+
+        foreach (var game in games)
+        {
+            var players = await _db.Players
+                .Where(x => x.GameId == game.Id)
+                .ToListAsync(cancellationToken);
+
+            game.Players = players.Select(x => x.ToDto()).ToList();
+        }
+
 
         return Ok(games);
     }
@@ -85,14 +96,15 @@ public class GameController : BaseController
     /// Get a list of games the user is playing
     /// </summary>
     /// <param name="gameIds">A list of Game Ids</param>
-    [HttpPost("my-games")]
+    [HttpGet("user/{userId}/my-games")]
     [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Get))]
-    public async Task<ActionResult<IEnumerable<GameDto>>> GetMyGames([FromBody] IEnumerable<string> gameIds, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<GameDto>>> GetMyGames(Guid userId, CancellationToken cancellationToken)
     {
-        var games = await _db.Games
-            .Where(x => gameIds.Any(y => Guid.Parse(y) == x.Id))
-            .Select(x => x.ToDto())
-            .ToListAsync(cancellationToken) ?? new List<GameDto>();
+        var games = (await _db.Players
+            .Include(x => x.Game)
+            .Where(x => x.UserId == userId)
+            .ToListAsync(cancellationToken))
+            .Select(x => x.Game.ToDto());
 
         return Ok(games);
     }
@@ -104,7 +116,8 @@ public class GameController : BaseController
     [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Get))]
     public async Task<ActionResult<GameDto>> GetGameById(Guid id, CancellationToken cancellationToken)
     {
-        var game = await _db.Games.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var game = await _db.Games
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         if (game == null)
         {
@@ -112,35 +125,51 @@ public class GameController : BaseController
 
         }
 
+        var players = await _db.Players
+            .Where(x => x.GameId == id)
+            .ToListAsync(cancellationToken);
+
+        game.Players = players;
+
         return Ok(game.ToDto());
     }
 
-    /// <summary>
-    /// Get Game by ID
-    /// </summary>
-    /// <returns>The Game</returns>
-    [HttpGet("{gameId}/players/{connectionId}")]
+    [HttpGet("users")]
     [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Get))]
-    public async Task<ActionResult<PlayerDto>> GetPlayerByConnectionId(Guid gameId, string connectionId, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers(CancellationToken cancellationToken)
     {
-        var game = await _db.Games.FirstOrDefaultAsync(x => x.Id == gameId, cancellationToken);
+        var userDtos = (await _db.Users.ToListAsync(cancellationToken))
+            .Select(x => x.ToDto());
 
-        if (game == null)
-        {
-            throw new Exception($"Game with ID: {gameId} could not be found");
-
-        }
-
-        var player = game.Players.FirstOrDefault(x => x.ConnectionId == connectionId);
-
-        if (player == null)
-        {
-            throw new Exception($"Player with ID: {connectionId} could not be found");
-
-        }
-
-        return Ok(player.ToDto());
+        return Ok(userDtos);
     }
+
+    ///// <summary>
+    ///// Get Game by ID
+    ///// </summary>
+    ///// <returns>The Game</returns>
+    //[HttpGet("{gameId}/players/{connectionId}")]
+    //[ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Get))]
+    //public async Task<ActionResult<PlayerDto>> GetPlayerByConnectionId(Guid gameId, string connectionId, CancellationToken cancellationToken)
+    //{
+    //    var game = await _db.Games.FirstOrDefaultAsync(x => x.Id == gameId, cancellationToken);
+
+    //    if (game == null)
+    //    {
+    //        throw new Exception($"Game with ID: {gameId} could not be found");
+
+    //    }
+
+    //    var player = game.Players.FirstOrDefault(x => x.ConnectionId == connectionId);
+
+    //    if (player == null)
+    //    {
+    //        throw new Exception($"Player with ID: {connectionId} could not be found");
+
+    //    }
+
+    //    return Ok(player.ToDto());
+    //}
 
     /// <summary>
     /// Create a new Game.
@@ -158,13 +187,13 @@ public class GameController : BaseController
             throw new Exception($"Game {dto.Id} could not be found");
         }
 
-        if (!string.IsNullOrEmpty(dto.PlayerName))
+        if (!string.IsNullOrEmpty(dto.UserId))
         {
             var player = new Player
             {
                 Id = Guid.NewGuid(),
-                Name = dto.PlayerName,
-                ConnectionId = dto.PlayerConnectionId
+                UserId = Guid.Parse(dto.UserId),
+                Name = dto.PlayerName
             };
 
             game.Players.Add(player);
@@ -172,7 +201,7 @@ public class GameController : BaseController
             var playerDto = player.ToDto();
             playerDto.GameId = game.Id;
 
-            await _gameHubContext.Groups.AddToGroupAsync(player.ConnectionId, game.Id.ToString(), cancellationToken);
+            await _gameHubContext.Groups.AddToGroupAsync(dto.ConnectionId, game.Id.ToString(), cancellationToken);
             await _gameHubContext.Clients.Group(game.Id.ToString()).NotifyPlayerAdded(playerDto);
         }
 
@@ -201,14 +230,8 @@ public class GameController : BaseController
     [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.Put))]
     public async Task<ActionResult> UpdatePlayer([FromBody] UpdatePlayerDto dto, CancellationToken cancellationToken)
     {
-        var game = await _db.Games.FirstOrDefaultAsync(x => x.Id == Guid.Parse(dto.GameId), cancellationToken);
-
-        if (game == null)
-        {
-            throw new Exception($"Game with ID {dto.GameId} could not be found");
-        }
-
-        var player = game.Players.FirstOrDefault(x => x.Id == Guid.Parse(dto.Id));
+        var player = await _db.Players
+            .FirstOrDefaultAsync(x => x.Id == Guid.Parse(dto.Id), cancellationToken);
 
         if (player == null)
         {
@@ -217,39 +240,39 @@ public class GameController : BaseController
 
         player.GameReady = dto.GameReady;
 
-        _db.Games.Update(game);
+        _db.Players.Update(player);
         await _db.SaveChangesAsync(cancellationToken);
 
-        await _gameHubContext.Clients.Group(game.Id.ToString()).NotifyPlayerUpdated(player.ToDto());
+        await _gameHubContext.Clients.Group(player.GameId.ToString()).NotifyPlayerUpdated(player.ToDto());
 
         return Ok();
     }
 
-    /// <summary>
-    /// Create a new Game.
-    /// Client is notified of Game creation via SignalR
-    /// </summary>
-    /// <param name="dto">A Game DTO.</param>
-    [HttpPut("players/{connectionId}")]
-    [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.PutReturnsDto))]
-    public async Task<ActionResult<IEnumerable<PlayerDto>>> UpdatePlayersConnectionIds(string connectionId, [FromBody] string newConnectionId, CancellationToken cancellationToken)
-    {
-        var games = (await _db.Games
-            .ToListAsync(cancellationToken))
-            .Where(x => x.Players.Any(y => y.ConnectionId == connectionId));
+    ///// <summary>
+    ///// Create a new Game.
+    ///// Client is notified of Game creation via SignalR
+    ///// </summary>
+    ///// <param name="dto">A Game DTO.</param>
+    //[HttpPut("players/{connectionId}")]
+    //[ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.PutReturnsDto))]
+    //public async Task<ActionResult<IEnumerable<PlayerDto>>> UpdatePlayersConnectionIds(string connectionId, [FromBody] string newConnectionId, CancellationToken cancellationToken)
+    //{
+    //    var games = (await _db.Games
+    //        .ToListAsync(cancellationToken))
+    //        .Where(x => x.Players.Any(y => y.ConnectionId == connectionId));
 
-        var players = games.SelectMany(x => x.Players).Where(x => x.ConnectionId == connectionId).ToList();
-        players.ForEach(async (player) => 
-        {
-            await _gameHubContext.Groups.RemoveFromGroupAsync(connectionId, player.GameId.ToString());
-            await _gameHubContext.Groups.AddToGroupAsync(newConnectionId, player.GameId.ToString());
+    //    var players = games.SelectMany(x => x.Players).Where(x => x.ConnectionId == connectionId).ToList();
+    //    players.ForEach(async (player) => 
+    //    {
+    //        await _gameHubContext.Groups.RemoveFromGroupAsync(connectionId, player.GameId.ToString());
+    //        await _gameHubContext.Groups.AddToGroupAsync(newConnectionId, player.GameId.ToString());
 
-            player.ConnectionId = newConnectionId; 
-        });
+    //        player.ConnectionId = newConnectionId; 
+    //    });
 
-        _db.Games.UpdateRange(games);
-        await _db.SaveChangesAsync(cancellationToken);
+    //    _db.Games.UpdateRange(games);
+    //    await _db.SaveChangesAsync(cancellationToken);
 
-        return Ok(players.Select(x => x.ToDto()));
-    }
+    //    return Ok(players.Select(x => x.ToDto()));
+    //}
 }

@@ -19,7 +19,6 @@ export const connectToGameHub = (queryClient: QueryClient, router: Router<AnyRou
             next.push(game);
             return next;
         });
-
     });
 
     connection.on('NotifyPlayerAdded', (player: PlayerDto) => {
@@ -27,15 +26,10 @@ export const connectToGameHub = (queryClient: QueryClient, router: Router<AnyRou
 
         queryClient.setQueryData<IGameDto>(gameApiQueryKeys.game(player.gameId!), (prev) => {
             const next = prev ? { ...prev } : new GameDto();
-            next.players?.push(player);
+            next.players = [...(next.players ?? []), player]
 
             return next;
         });
-
-        queryClient.setQueryData<IPlayerDto>(gameApiQueryKeys.playerByConnectionId(player.connectionId!, player.gameId!), () => {
-            return player;
-        });
-        //player && saveGameDataToSessionStorage({ gameId: player.gameId!, playerId: player.id});
     });
 
     connection.on('NotifyGameStart', (gameId: string) => {
@@ -46,41 +40,20 @@ export const connectToGameHub = (queryClient: QueryClient, router: Router<AnyRou
     connection.on('NotifyPlayerUpdated', (player: PlayerDto) => {
         console.log('playerUpdated', { player });
         queryClient.setQueryData<IGameDto>(gameApiQueryKeys.game(player.gameId!), (prev) => {
-            const next = prev ? { ...prev } : new GameDto();
 
-            next.players?.forEach(x => {
-                if (x.id === player.id) {
-                    x.gameReady = player.gameReady;
-                }
-            });
+            const next = prev ? { ...prev } : new GameDto();
+console.log({next, prev})
+            // next.players?.forEach(x => {
+            //     if (x.id === player.id) {
+            //         x.gameReady = player.gameReady;
+            //     }
+            // });
+
+            next.players = next.players?.map(x => ({...x, gameReady: player.gameReady}) as PlayerDto) ?? []
 
             return next;
         });
-
-        queryClient.setQueryData<IPlayerDto>(gameApiQueryKeys.playerByConnectionId(player.connectionId!, player.gameId!), () => {
-            return player;
-        });
     });
-
-    // connection.on('NotifyPlayersConnectionIdUpdated', (players: UpdatePlayerConnectionIdDto[]) => {
-    //     players.forEach((player) => {
-    //         queryClient.setQueryData<IGameDto>(gameApiQueryKeys.game(player.gameId!), (prev) => {
-    //             const next = prev ? { ...prev } : new GameDto();
-    //             next.players?.forEach(x => {
-    //                 if (x.id === player.id) {
-    //                     x.connectionId = player.connectionId;
-    //                 }
-    //             });
-
-    //             return next;
-    //         });
-    
-    //         queryClient.invalidateQueries()
-    //         queryClient.setQueryData<IPlayerDto>(gameApiQueryKeys.playerByConnectionId(player.connectionId!, player.gameId!), () => {
-    //             return player;
-    //         });
-    //     })
-    // });
 
     return connection;
 };
