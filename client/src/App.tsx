@@ -27,10 +27,10 @@ export const App = () => {
                                 </Button>
                             </Link>
                             <GameCreationButton />
-                            <UserSelection/>
+                            <UserSelection />
                         </div>
                     </div>
-                    <div className={'col-span-10 col-start-2 p-6'}>
+                    <div className={'col-span-10 col-start-2 pt-6 w-full h-full'}>
                         <Outlet />
                     </div>
                 </div>

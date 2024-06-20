@@ -78,3 +78,27 @@ export const routeTree = rootRoute.addChildren({
 })
 
 /* prettier-ignore-end */
+
+/* ROUTE_MANIFEST_START
+{
+  "routes": {
+    "__root__": {
+      "filePath": "__root.tsx",
+      "children": [
+        "/",
+        "/game/$gameId/lobby",
+        "/game/$gameId/room"
+      ]
+    },
+    "/": {
+      "filePath": "index.tsx"
+    },
+    "/game/$gameId/lobby": {
+      "filePath": "game.$gameId.lobby.lazy.tsx"
+    },
+    "/game/$gameId/room": {
+      "filePath": "game.$gameId.room.lazy.tsx"
+    }
+  }
+}
+ROUTE_MANIFEST_END */

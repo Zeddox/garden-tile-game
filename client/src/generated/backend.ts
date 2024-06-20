@@ -543,11 +543,12 @@ export enum GameStatus {
 }
 
 export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
-    name?: string | undefined;
-    gameId?: string;
-    userId?: string;
-    gameReady?: boolean;
-    gameLeader?: boolean;
+    name!: string;
+    gameId!: string;
+    userId!: string;
+    gameReady!: boolean;
+    gameLeader!: boolean;
+    gamePieceColor!: string;
 
     constructor(data?: IPlayerDto) {
         super(data);
@@ -561,6 +562,7 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
             this.userId = _data["userId"];
             this.gameReady = _data["gameReady"];
             this.gameLeader = _data["gameLeader"];
+            this.gamePieceColor = _data["gamePieceColor"];
         }
     }
 
@@ -578,17 +580,19 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
         data["userId"] = this.userId;
         data["gameReady"] = this.gameReady;
         data["gameLeader"] = this.gameLeader;
+        data["gamePieceColor"] = this.gamePieceColor;
         super.toJSON(data);
         return data;
     }
 }
 
 export interface IPlayerDto extends IBaseDtoOfGuid {
-    name?: string | undefined;
-    gameId?: string;
-    userId?: string;
-    gameReady?: boolean;
-    gameLeader?: boolean;
+    name: string;
+    gameId: string;
+    userId: string;
+    gameReady: boolean;
+    gameLeader: boolean;
+    gamePieceColor: string;
 }
 
 export class ProblemDetails implements IProblemDetails {
@@ -904,6 +908,7 @@ export class Player extends BaseModelOfGuid implements IPlayer {
     user?: User | undefined;
     gameReady?: boolean;
     gameLeader?: boolean;
+    gamePieceColor?: string | undefined;
 
     constructor(data?: IPlayer) {
         super(data);
@@ -919,6 +924,7 @@ export class Player extends BaseModelOfGuid implements IPlayer {
             this.user = _data["user"] ? User.fromJS(_data["user"]) : <any>undefined;
             this.gameReady = _data["gameReady"];
             this.gameLeader = _data["gameLeader"];
+            this.gamePieceColor = _data["gamePieceColor"];
         }
     }
 
@@ -938,6 +944,7 @@ export class Player extends BaseModelOfGuid implements IPlayer {
         data["user"] = this.user ? this.user.toJSON() : <any>undefined;
         data["gameReady"] = this.gameReady;
         data["gameLeader"] = this.gameLeader;
+        data["gamePieceColor"] = this.gamePieceColor;
         super.toJSON(data);
         return data;
     }
@@ -951,6 +958,7 @@ export interface IPlayer extends IBaseModelOfGuid {
     user?: User | undefined;
     gameReady?: boolean;
     gameLeader?: boolean;
+    gamePieceColor?: string | undefined;
 }
 
 export class Game extends BaseModelOfGuid implements IGame {
@@ -1101,8 +1109,10 @@ export interface IUpdateGameDto {
 
 export class UpdatePlayerDto implements IUpdatePlayerDto {
     id!: string;
+    name!: string;
     gameId!: string;
     gameReady!: boolean;
+    gamePieceColor!: string;
 
     constructor(data?: IUpdatePlayerDto) {
         if (data) {
@@ -1116,8 +1126,10 @@ export class UpdatePlayerDto implements IUpdatePlayerDto {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.name = _data["name"];
             this.gameId = _data["gameId"];
             this.gameReady = _data["gameReady"];
+            this.gamePieceColor = _data["gamePieceColor"];
         }
     }
 
@@ -1131,16 +1143,20 @@ export class UpdatePlayerDto implements IUpdatePlayerDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["name"] = this.name;
         data["gameId"] = this.gameId;
         data["gameReady"] = this.gameReady;
+        data["gamePieceColor"] = this.gamePieceColor;
         return data;
     }
 }
 
 export interface IUpdatePlayerDto {
     id: string;
+    name: string;
     gameId: string;
     gameReady: boolean;
+    gamePieceColor: string;
 }
 
 export class ApiException extends Error {

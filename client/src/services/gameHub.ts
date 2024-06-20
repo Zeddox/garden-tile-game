@@ -5,7 +5,10 @@ import { gameApiQueryKeys } from './gameApi';
 import { AnyRoute, Router } from '@tanstack/react-router';
 import { TrailingSlashOption } from 'node_modules/@tanstack/react-router/dist/esm/router';
 
-export const connectToGameHub = (queryClient: QueryClient, router: Router<AnyRoute, TrailingSlashOption, Record<string, any>, Record<string, any>>) => {
+export const connectToGameHub = (
+    queryClient: QueryClient,
+    router: Router<AnyRoute, TrailingSlashOption, Record<string, any>, Record<string, any>>
+) => {
     const connection = new signalR.HubConnectionBuilder()
         .withUrl('http://localhost:8020/game-hub')
         .withAutomaticReconnect()
@@ -25,7 +28,7 @@ export const connectToGameHub = (queryClient: QueryClient, router: Router<AnyRou
 
         queryClient.setQueryData<IGameDto>(gameApiQueryKeys.game(player.gameId!), (prev) => {
             const next = prev ? { ...prev } : new GameDto();
-            next.players = [...(next.players ?? []), player]
+            next.players = [...(next.players ?? []), player];
 
             return next;
         });
@@ -39,11 +42,14 @@ export const connectToGameHub = (queryClient: QueryClient, router: Router<AnyRou
     connection.on('NotifyPlayerUpdated', (player: PlayerDto) => {
         console.log('playerUpdated', { player });
         queryClient.setQueryData<IGameDto>(gameApiQueryKeys.game(player.gameId!), (prev) => {
-
             const next = prev ? { ...prev } : new GameDto();
-            console.log({next, prev})
-
-            next.players = next.players?.map(x => ({...x, gameReady: player.gameReady}) as PlayerDto) ?? []
+            console.log({ next, prev });
+            next.players = [...(next.players ?? [])];
+            next.players.splice(
+                next.players.findIndex((x) => x.id === player.id),
+                1,
+                player
+            );
 
             return next;
         });

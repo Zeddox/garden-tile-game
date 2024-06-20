@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GardenTileGame.Data.Models;
+
 public class Player : BaseModel<Guid>
 {
     [Required]
@@ -23,6 +24,8 @@ public class Player : BaseModel<Guid>
     public bool GameReady { get; set; }
 
     public bool GameLeader { get; set; }
+
+    public string GamePieceColor { get; set; }
 }
 
 public static class PlayerExtensions
@@ -36,7 +39,8 @@ public static class PlayerExtensions
             UserId = player.UserId,
             GameId = player.GameId,
             GameReady = player.GameReady,
-            GameLeader = player.GameLeader
+            GameLeader = player.GameLeader,
+            GamePieceColor = player.GamePieceColor
         };
     }
 }
