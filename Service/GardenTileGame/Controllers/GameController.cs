@@ -5,6 +5,7 @@ using GardenTileGame.Data.DTOs;
 using GardenTileGame.Data.Infrastructure;
 using GardenTileGame.Data.Models;
 using GardenTileGame.Data.Routes;
+using GardentTileGame.Command;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -18,14 +19,17 @@ public class GameController : BaseController
     private readonly ILogger<GameController> _logger;
     private readonly GardenTileGameDbContext _db;
     private readonly IHubContext<GameHub, IGameClient> _gameHubContext;
+    private readonly GameEngine _gameEngine;
 
     public GameController(ILogger<GameController> logger,
         GardenTileGameDbContext dbContext,
-        IHubContext<GameHub, IGameClient> gameHubContext) : base()
+        IHubContext<GameHub, IGameClient> gameHubContext,
+        GameEngine gameEngine) : base()
     {
         _logger = logger;
         _db = dbContext;
         _gameHubContext = gameHubContext;
+        _gameEngine = gameEngine;
     }
 
     /// <summary>
@@ -182,18 +186,26 @@ public class GameController : BaseController
             await _gameHubContext.Clients.Group(game.Id.ToString()).NotifyPlayerAdded(playerDto);
         }
 
+        var isNewGameStart = false;
+
         if (dto.GameStatus != game.GameStatus)
         {
             game.GameStatus = dto.GameStatus;
 
             if (game.GameStatus == GameStatus.InProgress)
             {
-                await _gameHubContext.Clients.Group(game.Id.ToString()).NotifyGameStart(game.Id.ToString());
+                isNewGameStart = true;
+                _gameEngine.MakeGameStartState(game);
             }
         }
 
         _db.Games.Update(game);
         await _db.SaveChangesAsync(cancellationToken);
+
+        if (isNewGameStart)
+        {
+            await _gameHubContext.Clients.Group(game.Id.ToString()).NotifyGameStart(game.ToDto());
+        }
 
         return Ok();
     }

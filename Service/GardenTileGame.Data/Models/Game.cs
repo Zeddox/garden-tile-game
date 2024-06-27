@@ -1,7 +1,7 @@
 ﻿#nullable disable
+
 using GardenTileGame.Data.DTOs;
 using System.ComponentModel.DataAnnotations;
-using System.Net.NetworkInformation;
 
 namespace GardenTileGame.Data.Models;
 
@@ -12,6 +12,15 @@ public class Game : BaseModel<Guid>
 
     [Required]
     public GameStatus GameStatus { get; set; }
+
+    public Guid StartingPlayerId { get; set; }
+
+    public List<Tile> FirstRoundTiles { get; set; }
+    public List<Tile> SecondRoundTiles { get; set; }
+    public List<Tile> ThirdRoundTiles { get; set; }
+    public List<Tile> FourthRoundTiles { get; set; }
+    public List<Tile> FifthRoundTiles { get; set; }
+    public List<Tile> SixthRoundTiles { get; set; }
 
     public virtual IList<Player> Players { get; set; }
 }
@@ -25,7 +34,14 @@ public static class GameExtensions
             Id = game.Id,
             GameName = game.GameName,
             GameStatus = game.GameStatus,
-            Players = game.Players.Select(x => x.ToDto()).ToList()
+            StartingPlayerId = game?.StartingPlayerId ?? Guid.Empty,
+            Players = game.Players.Select(x => x.ToDto()).ToList(),
+            FirstRoundTiles = game.FirstRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
+            SecondRoundTiles = game.SecondRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
+            ThirdRoundTiles = game.ThirdRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
+            FourthRoundTiles = game.FourthRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
+            FifthRoundTiles = game.FifthRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
+            SixthRoundTiles = game.SixthRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
         };
     }
 }

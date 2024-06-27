@@ -26,6 +26,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\GardenTileGame.Data\GardenTileGame.Data.csproj" />
+		<ProjectReference Include="..\GardentTileGame.Command\GardenTileGame.Command.csproj" />
 	</ItemGroup>
 
 	<!-- https://github.com/RicoSuter/NSwag/wiki/Assembly-loading#net-core -->

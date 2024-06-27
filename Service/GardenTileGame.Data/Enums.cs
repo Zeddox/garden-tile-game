@@ -14,3 +14,20 @@ public enum GameStatus
     Finished
 }
 
+public enum TileType
+{
+    MapleTree,
+    Pagoda,
+    Fish,
+    AzaleaBush,
+    Boxwood,
+    Stone
+}
+
+public enum TileShape
+{
+    Single,
+    Double,
+    Triple,
+    Corner
+}

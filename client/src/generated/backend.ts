@@ -490,6 +490,13 @@ export interface IBaseDtoOfGuid {
 export class GameDto extends BaseDtoOfGuid implements IGameDto {
     gameName!: string;
     gameStatus!: GameStatus;
+    startingPlayerId?: string;
+    firstRoundTiles?: TileDto[] | undefined;
+    secondRoundTiles?: TileDto[] | undefined;
+    thirdRoundTiles?: TileDto[] | undefined;
+    fourthRoundTiles?: TileDto[] | undefined;
+    fifthRoundTiles?: TileDto[] | undefined;
+    sixthRoundTiles?: TileDto[] | undefined;
     players?: PlayerDto[] | undefined;
 
     constructor(data?: IGameDto) {
@@ -501,6 +508,37 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
         if (_data) {
             this.gameName = _data["gameName"];
             this.gameStatus = _data["gameStatus"];
+            this.startingPlayerId = _data["startingPlayerId"];
+            if (Array.isArray(_data["firstRoundTiles"])) {
+                this.firstRoundTiles = [] as any;
+                for (let item of _data["firstRoundTiles"])
+                    this.firstRoundTiles!.push(TileDto.fromJS(item));
+            }
+            if (Array.isArray(_data["secondRoundTiles"])) {
+                this.secondRoundTiles = [] as any;
+                for (let item of _data["secondRoundTiles"])
+                    this.secondRoundTiles!.push(TileDto.fromJS(item));
+            }
+            if (Array.isArray(_data["thirdRoundTiles"])) {
+                this.thirdRoundTiles = [] as any;
+                for (let item of _data["thirdRoundTiles"])
+                    this.thirdRoundTiles!.push(TileDto.fromJS(item));
+            }
+            if (Array.isArray(_data["fourthRoundTiles"])) {
+                this.fourthRoundTiles = [] as any;
+                for (let item of _data["fourthRoundTiles"])
+                    this.fourthRoundTiles!.push(TileDto.fromJS(item));
+            }
+            if (Array.isArray(_data["fifthRoundTiles"])) {
+                this.fifthRoundTiles = [] as any;
+                for (let item of _data["fifthRoundTiles"])
+                    this.fifthRoundTiles!.push(TileDto.fromJS(item));
+            }
+            if (Array.isArray(_data["sixthRoundTiles"])) {
+                this.sixthRoundTiles = [] as any;
+                for (let item of _data["sixthRoundTiles"])
+                    this.sixthRoundTiles!.push(TileDto.fromJS(item));
+            }
             if (Array.isArray(_data["players"])) {
                 this.players = [] as any;
                 for (let item of _data["players"])
@@ -520,6 +558,37 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
         data = typeof data === 'object' ? data : {};
         data["gameName"] = this.gameName;
         data["gameStatus"] = this.gameStatus;
+        data["startingPlayerId"] = this.startingPlayerId;
+        if (Array.isArray(this.firstRoundTiles)) {
+            data["firstRoundTiles"] = [];
+            for (let item of this.firstRoundTiles)
+                data["firstRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.secondRoundTiles)) {
+            data["secondRoundTiles"] = [];
+            for (let item of this.secondRoundTiles)
+                data["secondRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.thirdRoundTiles)) {
+            data["thirdRoundTiles"] = [];
+            for (let item of this.thirdRoundTiles)
+                data["thirdRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fourthRoundTiles)) {
+            data["fourthRoundTiles"] = [];
+            for (let item of this.fourthRoundTiles)
+                data["fourthRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fifthRoundTiles)) {
+            data["fifthRoundTiles"] = [];
+            for (let item of this.fifthRoundTiles)
+                data["fifthRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.sixthRoundTiles)) {
+            data["sixthRoundTiles"] = [];
+            for (let item of this.sixthRoundTiles)
+                data["sixthRoundTiles"].push(item.toJSON());
+        }
         if (Array.isArray(this.players)) {
             data["players"] = [];
             for (let item of this.players)
@@ -533,6 +602,13 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
 export interface IGameDto extends IBaseDtoOfGuid {
     gameName: string;
     gameStatus: GameStatus;
+    startingPlayerId?: string;
+    firstRoundTiles?: TileDto[] | undefined;
+    secondRoundTiles?: TileDto[] | undefined;
+    thirdRoundTiles?: TileDto[] | undefined;
+    fourthRoundTiles?: TileDto[] | undefined;
+    fifthRoundTiles?: TileDto[] | undefined;
+    sixthRoundTiles?: TileDto[] | undefined;
     players?: PlayerDto[] | undefined;
 }
 
@@ -540,6 +616,74 @@ export enum GameStatus {
     Setup = 0,
     InProgress = 1,
     Finished = 2,
+}
+
+export class TileDto implements ITileDto {
+    type?: TileType;
+    shape?: TileShape;
+    typePositionX?: number;
+    typePositionY?: number;
+    typeQuantity?: number;
+
+    constructor(data?: ITileDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.type = _data["type"];
+            this.shape = _data["shape"];
+            this.typePositionX = _data["typePositionX"];
+            this.typePositionY = _data["typePositionY"];
+            this.typeQuantity = _data["typeQuantity"];
+        }
+    }
+
+    static fromJS(data: any): TileDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TileDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["type"] = this.type;
+        data["shape"] = this.shape;
+        data["typePositionX"] = this.typePositionX;
+        data["typePositionY"] = this.typePositionY;
+        data["typeQuantity"] = this.typeQuantity;
+        return data;
+    }
+}
+
+export interface ITileDto {
+    type?: TileType;
+    shape?: TileShape;
+    typePositionX?: number;
+    typePositionY?: number;
+    typeQuantity?: number;
+}
+
+export enum TileType {
+    MapleTree = 0,
+    Pagoda = 1,
+    Fish = 2,
+    AzaleaBush = 3,
+    Boxwood = 4,
+    Stone = 5,
+}
+
+export enum TileShape {
+    Single = 0,
+    Double = 1,
+    Triple = 2,
+    Corner = 3,
 }
 
 export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
@@ -909,6 +1053,7 @@ export class Player extends BaseModelOfGuid implements IPlayer {
     gameReady?: boolean;
     gameLeader?: boolean;
     gamePieceColor?: string | undefined;
+    order?: number;
 
     constructor(data?: IPlayer) {
         super(data);
@@ -925,6 +1070,7 @@ export class Player extends BaseModelOfGuid implements IPlayer {
             this.gameReady = _data["gameReady"];
             this.gameLeader = _data["gameLeader"];
             this.gamePieceColor = _data["gamePieceColor"];
+            this.order = _data["order"];
         }
     }
 
@@ -945,6 +1091,7 @@ export class Player extends BaseModelOfGuid implements IPlayer {
         data["gameReady"] = this.gameReady;
         data["gameLeader"] = this.gameLeader;
         data["gamePieceColor"] = this.gamePieceColor;
+        data["order"] = this.order;
         super.toJSON(data);
         return data;
     }
@@ -959,11 +1106,19 @@ export interface IPlayer extends IBaseModelOfGuid {
     gameReady?: boolean;
     gameLeader?: boolean;
     gamePieceColor?: string | undefined;
+    order?: number;
 }
 
 export class Game extends BaseModelOfGuid implements IGame {
     gameName!: string;
     gameStatus!: GameStatus;
+    startingPlayerId?: string;
+    firstRoundTiles?: Tile[] | undefined;
+    secondRoundTiles?: Tile[] | undefined;
+    thirdRoundTiles?: Tile[] | undefined;
+    fourthRoundTiles?: Tile[] | undefined;
+    fifthRoundTiles?: Tile[] | undefined;
+    sixthRoundTiles?: Tile[] | undefined;
     players?: Player[] | undefined;
 
     constructor(data?: IGame) {
@@ -975,6 +1130,37 @@ export class Game extends BaseModelOfGuid implements IGame {
         if (_data) {
             this.gameName = _data["gameName"];
             this.gameStatus = _data["gameStatus"];
+            this.startingPlayerId = _data["startingPlayerId"];
+            if (Array.isArray(_data["firstRoundTiles"])) {
+                this.firstRoundTiles = [] as any;
+                for (let item of _data["firstRoundTiles"])
+                    this.firstRoundTiles!.push(Tile.fromJS(item));
+            }
+            if (Array.isArray(_data["secondRoundTiles"])) {
+                this.secondRoundTiles = [] as any;
+                for (let item of _data["secondRoundTiles"])
+                    this.secondRoundTiles!.push(Tile.fromJS(item));
+            }
+            if (Array.isArray(_data["thirdRoundTiles"])) {
+                this.thirdRoundTiles = [] as any;
+                for (let item of _data["thirdRoundTiles"])
+                    this.thirdRoundTiles!.push(Tile.fromJS(item));
+            }
+            if (Array.isArray(_data["fourthRoundTiles"])) {
+                this.fourthRoundTiles = [] as any;
+                for (let item of _data["fourthRoundTiles"])
+                    this.fourthRoundTiles!.push(Tile.fromJS(item));
+            }
+            if (Array.isArray(_data["fifthRoundTiles"])) {
+                this.fifthRoundTiles = [] as any;
+                for (let item of _data["fifthRoundTiles"])
+                    this.fifthRoundTiles!.push(Tile.fromJS(item));
+            }
+            if (Array.isArray(_data["sixthRoundTiles"])) {
+                this.sixthRoundTiles = [] as any;
+                for (let item of _data["sixthRoundTiles"])
+                    this.sixthRoundTiles!.push(Tile.fromJS(item));
+            }
             if (Array.isArray(_data["players"])) {
                 this.players = [] as any;
                 for (let item of _data["players"])
@@ -994,6 +1180,37 @@ export class Game extends BaseModelOfGuid implements IGame {
         data = typeof data === 'object' ? data : {};
         data["gameName"] = this.gameName;
         data["gameStatus"] = this.gameStatus;
+        data["startingPlayerId"] = this.startingPlayerId;
+        if (Array.isArray(this.firstRoundTiles)) {
+            data["firstRoundTiles"] = [];
+            for (let item of this.firstRoundTiles)
+                data["firstRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.secondRoundTiles)) {
+            data["secondRoundTiles"] = [];
+            for (let item of this.secondRoundTiles)
+                data["secondRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.thirdRoundTiles)) {
+            data["thirdRoundTiles"] = [];
+            for (let item of this.thirdRoundTiles)
+                data["thirdRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fourthRoundTiles)) {
+            data["fourthRoundTiles"] = [];
+            for (let item of this.fourthRoundTiles)
+                data["fourthRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fifthRoundTiles)) {
+            data["fifthRoundTiles"] = [];
+            for (let item of this.fifthRoundTiles)
+                data["fifthRoundTiles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.sixthRoundTiles)) {
+            data["sixthRoundTiles"] = [];
+            for (let item of this.sixthRoundTiles)
+                data["sixthRoundTiles"].push(item.toJSON());
+        }
         if (Array.isArray(this.players)) {
             data["players"] = [];
             for (let item of this.players)
@@ -1007,7 +1224,66 @@ export class Game extends BaseModelOfGuid implements IGame {
 export interface IGame extends IBaseModelOfGuid {
     gameName: string;
     gameStatus: GameStatus;
+    startingPlayerId?: string;
+    firstRoundTiles?: Tile[] | undefined;
+    secondRoundTiles?: Tile[] | undefined;
+    thirdRoundTiles?: Tile[] | undefined;
+    fourthRoundTiles?: Tile[] | undefined;
+    fifthRoundTiles?: Tile[] | undefined;
+    sixthRoundTiles?: Tile[] | undefined;
     players?: Player[] | undefined;
+}
+
+export class Tile implements ITile {
+    type?: TileType;
+    shape?: TileShape;
+    typePositionX?: number;
+    typePositionY?: number;
+    typeQuantity?: number;
+
+    constructor(data?: ITile) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.type = _data["type"];
+            this.shape = _data["shape"];
+            this.typePositionX = _data["typePositionX"];
+            this.typePositionY = _data["typePositionY"];
+            this.typeQuantity = _data["typeQuantity"];
+        }
+    }
+
+    static fromJS(data: any): Tile {
+        data = typeof data === 'object' ? data : {};
+        let result = new Tile();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["type"] = this.type;
+        data["shape"] = this.shape;
+        data["typePositionX"] = this.typePositionX;
+        data["typePositionY"] = this.typePositionY;
+        data["typeQuantity"] = this.typeQuantity;
+        return data;
+    }
+}
+
+export interface ITile {
+    type?: TileType;
+    shape?: TileShape;
+    typePositionX?: number;
+    typePositionY?: number;
+    typeQuantity?: number;
 }
 
 export class User extends BaseModelOfGuid implements IUser {
