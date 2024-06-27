@@ -90,3 +90,8 @@
         @apply bg-background text-foreground;
     }
 }
+
+
+:root {
+    --loading-dot-color: var(--primary-80)
+}

@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Numerics;
 
 namespace GardenTileGame.API.Controllers;
 
@@ -51,7 +50,8 @@ public class GameController : BaseController
                     Name = dto.PlayerName,
                     UserId = Guid.Parse(dto.UserId),
                     GameLeader = true,
-                    GameReady = true
+                    GameReady = true,
+                    GamePieceColor = "#FF0000"
                 }
             }
         };
@@ -88,7 +88,6 @@ public class GameController : BaseController
             game.Players = players.Select(x => x.ToDto()).ToList();
         }
 
-
         return Ok(games);
     }
 
@@ -108,6 +107,7 @@ public class GameController : BaseController
 
         return Ok(games);
     }
+
     /// <summary>
     /// Get Game by ID
     /// </summary>
@@ -122,7 +122,6 @@ public class GameController : BaseController
         if (game == null)
         {
             throw new Exception($"Game with ID: {id} could not be found");
-
         }
 
         var players = await _db.Players
@@ -162,11 +161,16 @@ public class GameController : BaseController
 
         if (!string.IsNullOrEmpty(dto.UserId))
         {
+            var players = await _db.Players
+                .Where(x => x.GameId == game.Id)
+                .ToListAsync(cancellationToken);
+
             var player = new Player
             {
                 Id = Guid.NewGuid(),
                 UserId = Guid.Parse(dto.UserId),
-                Name = dto.PlayerName
+                Name = dto.PlayerName,
+                GamePieceColor = new List<string> { "#00FF00", "#0000FF", "#00FF66" }.ElementAt(players.Count - 1)
             };
 
             game.Players.Add(player);
@@ -211,7 +215,9 @@ public class GameController : BaseController
             throw new Exception($"Player with ID {dto.Id} could not be found");
         }
 
+        player.Name = dto.Name;
         player.GameReady = dto.GameReady;
+        player.GamePieceColor = dto.GamePieceColor;
 
         _db.Players.Update(player);
         await _db.SaveChangesAsync(cancellationToken);
