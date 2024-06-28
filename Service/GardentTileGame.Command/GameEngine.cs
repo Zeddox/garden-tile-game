@@ -21,7 +21,7 @@ public class GameEngine
         }
         game.StartingPlayerId = playerOrder[0].Id;
 
-        var roundTiles = MakeTilesForRounds(game.Players.Count == 4 ? 6 : game.Players.Count == 3 ? 5 : 4);
+        var roundTiles = MakeTilesForRounds(game.Players.Count == 4 ? 4 : game.Players.Count == 3 ? 5 : 6);
         game.FirstRoundTiles = roundTiles.GetValueOrDefault(1);
         game.SecondRoundTiles = roundTiles.GetValueOrDefault(2);
         game.ThirdRoundTiles = roundTiles.GetValueOrDefault(3);
