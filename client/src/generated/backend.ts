@@ -498,6 +498,7 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
     fifthRoundTiles?: TileDto[] | undefined;
     sixthRoundTiles?: TileDto[] | undefined;
     players?: PlayerDto[] | undefined;
+    turns?: TurnDto[] | undefined;
 
     constructor(data?: IGameDto) {
         super(data);
@@ -543,6 +544,11 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
                 this.players = [] as any;
                 for (let item of _data["players"])
                     this.players!.push(PlayerDto.fromJS(item));
+            }
+            if (Array.isArray(_data["turns"])) {
+                this.turns = [] as any;
+                for (let item of _data["turns"])
+                    this.turns!.push(TurnDto.fromJS(item));
             }
         }
     }
@@ -594,6 +600,11 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
             for (let item of this.players)
                 data["players"].push(item.toJSON());
         }
+        if (Array.isArray(this.turns)) {
+            data["turns"] = [];
+            for (let item of this.turns)
+                data["turns"].push(item.toJSON());
+        }
         super.toJSON(data);
         return data;
     }
@@ -610,6 +621,7 @@ export interface IGameDto extends IBaseDtoOfGuid {
     fifthRoundTiles?: TileDto[] | undefined;
     sixthRoundTiles?: TileDto[] | undefined;
     players?: PlayerDto[] | undefined;
+    turns?: TurnDto[] | undefined;
 }
 
 export enum GameStatus {
@@ -618,7 +630,7 @@ export enum GameStatus {
     Finished = 2,
 }
 
-export class TileDto implements ITileDto {
+export class TileDto extends BaseDtoOfGuid implements ITileDto {
     type?: TileType;
     shape?: TileShape;
     typePositionX?: number;
@@ -626,15 +638,11 @@ export class TileDto implements ITileDto {
     typeQuantity?: number;
 
     constructor(data?: ITileDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
+        super(data);
     }
 
-    init(_data?: any) {
+    override init(_data?: any) {
+        super.init(_data);
         if (_data) {
             this.type = _data["type"];
             this.shape = _data["shape"];
@@ -644,25 +652,26 @@ export class TileDto implements ITileDto {
         }
     }
 
-    static fromJS(data: any): TileDto {
+    static override fromJS(data: any): TileDto {
         data = typeof data === 'object' ? data : {};
         let result = new TileDto();
         result.init(data);
         return result;
     }
 
-    toJSON(data?: any) {
+    override toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["type"] = this.type;
         data["shape"] = this.shape;
         data["typePositionX"] = this.typePositionX;
         data["typePositionY"] = this.typePositionY;
         data["typeQuantity"] = this.typeQuantity;
+        super.toJSON(data);
         return data;
     }
 }
 
-export interface ITileDto {
+export interface ITileDto extends IBaseDtoOfGuid {
     type?: TileType;
     shape?: TileShape;
     typePositionX?: number;
@@ -693,6 +702,7 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
     gameReady!: boolean;
     gameLeader!: boolean;
     gamePieceColor!: string;
+    order?: number;
 
     constructor(data?: IPlayerDto) {
         super(data);
@@ -707,6 +717,7 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
             this.gameReady = _data["gameReady"];
             this.gameLeader = _data["gameLeader"];
             this.gamePieceColor = _data["gamePieceColor"];
+            this.order = _data["order"];
         }
     }
 
@@ -725,6 +736,7 @@ export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
         data["gameReady"] = this.gameReady;
         data["gameLeader"] = this.gameLeader;
         data["gamePieceColor"] = this.gamePieceColor;
+        data["order"] = this.order;
         super.toJSON(data);
         return data;
     }
@@ -737,6 +749,78 @@ export interface IPlayerDto extends IBaseDtoOfGuid {
     gameReady: boolean;
     gameLeader: boolean;
     gamePieceColor: string;
+    order?: number;
+}
+
+export class TurnDto implements ITurnDto {
+    round?: number;
+    turnNumber?: number;
+    playerId?: string;
+    tileId?: string;
+    positionX?: number;
+    positionY?: number;
+    rotation?: TileRotation;
+    layer?: number;
+
+    constructor(data?: ITurnDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.round = _data["round"];
+            this.turnNumber = _data["turnNumber"];
+            this.playerId = _data["playerId"];
+            this.tileId = _data["tileId"];
+            this.positionX = _data["positionX"];
+            this.positionY = _data["positionY"];
+            this.rotation = _data["rotation"];
+            this.layer = _data["layer"];
+        }
+    }
+
+    static fromJS(data: any): TurnDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TurnDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["round"] = this.round;
+        data["turnNumber"] = this.turnNumber;
+        data["playerId"] = this.playerId;
+        data["tileId"] = this.tileId;
+        data["positionX"] = this.positionX;
+        data["positionY"] = this.positionY;
+        data["rotation"] = this.rotation;
+        data["layer"] = this.layer;
+        return data;
+    }
+}
+
+export interface ITurnDto {
+    round?: number;
+    turnNumber?: number;
+    playerId?: string;
+    tileId?: string;
+    positionX?: number;
+    positionY?: number;
+    rotation?: TileRotation;
+    layer?: number;
+}
+
+export enum TileRotation {
+    Zero = 0,
+    Ninety = 1,
+    OneHundredEighty = 2,
+    TwoHunderedSeventy = 3,
 }
 
 export class ProblemDetails implements IProblemDetails {
@@ -1119,6 +1203,7 @@ export class Game extends BaseModelOfGuid implements IGame {
     fourthRoundTiles?: Tile[] | undefined;
     fifthRoundTiles?: Tile[] | undefined;
     sixthRoundTiles?: Tile[] | undefined;
+    turns?: Turn[] | undefined;
     players?: Player[] | undefined;
 
     constructor(data?: IGame) {
@@ -1160,6 +1245,11 @@ export class Game extends BaseModelOfGuid implements IGame {
                 this.sixthRoundTiles = [] as any;
                 for (let item of _data["sixthRoundTiles"])
                     this.sixthRoundTiles!.push(Tile.fromJS(item));
+            }
+            if (Array.isArray(_data["turns"])) {
+                this.turns = [] as any;
+                for (let item of _data["turns"])
+                    this.turns!.push(Turn.fromJS(item));
             }
             if (Array.isArray(_data["players"])) {
                 this.players = [] as any;
@@ -1211,6 +1301,11 @@ export class Game extends BaseModelOfGuid implements IGame {
             for (let item of this.sixthRoundTiles)
                 data["sixthRoundTiles"].push(item.toJSON());
         }
+        if (Array.isArray(this.turns)) {
+            data["turns"] = [];
+            for (let item of this.turns)
+                data["turns"].push(item.toJSON());
+        }
         if (Array.isArray(this.players)) {
             data["players"] = [];
             for (let item of this.players)
@@ -1231,10 +1326,11 @@ export interface IGame extends IBaseModelOfGuid {
     fourthRoundTiles?: Tile[] | undefined;
     fifthRoundTiles?: Tile[] | undefined;
     sixthRoundTiles?: Tile[] | undefined;
+    turns?: Turn[] | undefined;
     players?: Player[] | undefined;
 }
 
-export class Tile implements ITile {
+export class Tile extends BaseModelOfGuid implements ITile {
     type?: TileType;
     shape?: TileShape;
     typePositionX?: number;
@@ -1242,6 +1338,58 @@ export class Tile implements ITile {
     typeQuantity?: number;
 
     constructor(data?: ITile) {
+        super(data);
+    }
+
+    override init(_data?: any) {
+        super.init(_data);
+        if (_data) {
+            this.type = _data["type"];
+            this.shape = _data["shape"];
+            this.typePositionX = _data["typePositionX"];
+            this.typePositionY = _data["typePositionY"];
+            this.typeQuantity = _data["typeQuantity"];
+        }
+    }
+
+    static override fromJS(data: any): Tile {
+        data = typeof data === 'object' ? data : {};
+        let result = new Tile();
+        result.init(data);
+        return result;
+    }
+
+    override toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["type"] = this.type;
+        data["shape"] = this.shape;
+        data["typePositionX"] = this.typePositionX;
+        data["typePositionY"] = this.typePositionY;
+        data["typeQuantity"] = this.typeQuantity;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface ITile extends IBaseModelOfGuid {
+    type?: TileType;
+    shape?: TileShape;
+    typePositionX?: number;
+    typePositionY?: number;
+    typeQuantity?: number;
+}
+
+export class Turn implements ITurn {
+    round?: number;
+    turnNumber?: number;
+    playerId?: string;
+    tileId?: string;
+    positionX?: number;
+    positionY?: number;
+    rotation?: TileRotation;
+    layer?: number;
+
+    constructor(data?: ITurn) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1252,38 +1400,47 @@ export class Tile implements ITile {
 
     init(_data?: any) {
         if (_data) {
-            this.type = _data["type"];
-            this.shape = _data["shape"];
-            this.typePositionX = _data["typePositionX"];
-            this.typePositionY = _data["typePositionY"];
-            this.typeQuantity = _data["typeQuantity"];
+            this.round = _data["round"];
+            this.turnNumber = _data["turnNumber"];
+            this.playerId = _data["playerId"];
+            this.tileId = _data["tileId"];
+            this.positionX = _data["positionX"];
+            this.positionY = _data["positionY"];
+            this.rotation = _data["rotation"];
+            this.layer = _data["layer"];
         }
     }
 
-    static fromJS(data: any): Tile {
+    static fromJS(data: any): Turn {
         data = typeof data === 'object' ? data : {};
-        let result = new Tile();
+        let result = new Turn();
         result.init(data);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["type"] = this.type;
-        data["shape"] = this.shape;
-        data["typePositionX"] = this.typePositionX;
-        data["typePositionY"] = this.typePositionY;
-        data["typeQuantity"] = this.typeQuantity;
+        data["round"] = this.round;
+        data["turnNumber"] = this.turnNumber;
+        data["playerId"] = this.playerId;
+        data["tileId"] = this.tileId;
+        data["positionX"] = this.positionX;
+        data["positionY"] = this.positionY;
+        data["rotation"] = this.rotation;
+        data["layer"] = this.layer;
         return data;
     }
 }
 
-export interface ITile {
-    type?: TileType;
-    shape?: TileShape;
-    typePositionX?: number;
-    typePositionY?: number;
-    typeQuantity?: number;
+export interface ITurn {
+    round?: number;
+    turnNumber?: number;
+    playerId?: string;
+    tileId?: string;
+    positionX?: number;
+    positionY?: number;
+    rotation?: TileRotation;
+    layer?: number;
 }
 
 export class User extends BaseModelOfGuid implements IUser {

@@ -1,6 +1,6 @@
 ﻿namespace GardenTileGame.Data.DTOs;
 
-public class TileDto
+public class TileDto : BaseDto<Guid>
 {
     public TileType Type { get; set; }
 

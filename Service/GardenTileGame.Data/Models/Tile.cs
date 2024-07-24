@@ -2,7 +2,7 @@
 
 namespace GardenTileGame.Data.Models;
 
-public class Tile
+public class Tile : BaseModel<Guid>
 {
     public TileType Type { get; set; }
 
@@ -19,6 +19,7 @@ public static class TileExtensions
     {
         return new TileDto
         {
+            Id = tile.Id,
             Type = tile.Type,
             Shape = tile.Shape,
             TypePositionX = tile.TypePositionX,

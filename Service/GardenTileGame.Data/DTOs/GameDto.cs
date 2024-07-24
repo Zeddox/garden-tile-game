@@ -15,13 +15,20 @@ public class GameDto : BaseDto<Guid>
     public Guid StartingPlayerId { get; set; }
 
     public List<TileDto> FirstRoundTiles { get; set; }
+
     public List<TileDto> SecondRoundTiles { get; set; }
+
     public List<TileDto> ThirdRoundTiles { get; set; }
+
     public List<TileDto> FourthRoundTiles { get; set; }
+
     public List<TileDto> FifthRoundTiles { get; set; }
+
     public List<TileDto> SixthRoundTiles { get; set; }
 
     public IList<PlayerDto> Players { get; set; }
+
+    public List<TurnDto> Turns { get; set; }
 }
 
 public class CreateGameDto
@@ -47,6 +54,8 @@ public class UpdateGameDto
     public GameStatus GameStatus { get; set; }
 
     public string PlayerName { get; set; }
+
     public string UserId { get; set; }
+
     public string ConnectionId { get; set; }
 }

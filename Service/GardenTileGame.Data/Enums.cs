@@ -31,3 +31,11 @@ public enum TileShape
     Triple,
     Corner
 }
+
+public enum TileRotation
+{
+    Zero,
+    Ninety,
+    OneHundredEighty,
+    TwoHunderedSeventy
+}

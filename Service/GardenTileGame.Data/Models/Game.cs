@@ -16,11 +16,18 @@ public class Game : BaseModel<Guid>
     public Guid StartingPlayerId { get; set; }
 
     public List<Tile> FirstRoundTiles { get; set; }
+
     public List<Tile> SecondRoundTiles { get; set; }
+
     public List<Tile> ThirdRoundTiles { get; set; }
+
     public List<Tile> FourthRoundTiles { get; set; }
+
     public List<Tile> FifthRoundTiles { get; set; }
+
     public List<Tile> SixthRoundTiles { get; set; }
+
+    public List<Turn> Turns { get; set; }
 
     public virtual IList<Player> Players { get; set; }
 }
@@ -42,6 +49,7 @@ public static class GameExtensions
             FourthRoundTiles = game.FourthRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
             FifthRoundTiles = game.FifthRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
             SixthRoundTiles = game.SixthRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
+            Turns = game.Turns?.Select(x => x.ToDto()).ToList() ?? new List<TurnDto>(),
         };
     }
 }
