@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using GardentTileGame.Command;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ public static class StartupExtensions
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        serviceCollection.AddSingleton(new GameEngine());
         return serviceCollection;
     }
 
@@ -29,7 +31,7 @@ public static class StartupExtensions
             throw new ArgumentException($"'Cosmos:DatabaseName' is not defined in ConfigurationManager");
         }
 
-        // TODO: 
+        // TODO:
         // Implement extension methods and use constants
         if (environment.Equals("Test"))
         {

@@ -26,6 +26,8 @@ public class Player : BaseModel<Guid>
     public bool GameLeader { get; set; }
 
     public string GamePieceColor { get; set; }
+
+    public int Order { get; set; }
 }
 
 public static class PlayerExtensions
@@ -40,7 +42,8 @@ public static class PlayerExtensions
             GameId = player.GameId,
             GameReady = player.GameReady,
             GameLeader = player.GameLeader,
-            GamePieceColor = player.GamePieceColor
+            GamePieceColor = player.GamePieceColor,
+            Order = player.Order
         };
     }
 }

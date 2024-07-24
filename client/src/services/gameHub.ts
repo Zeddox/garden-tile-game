@@ -7,6 +7,7 @@ import { TrailingSlashOption } from 'node_modules/@tanstack/react-router/dist/es
 
 export const connectToGameHub = (
     queryClient: QueryClient,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     router: Router<AnyRoute, TrailingSlashOption, Record<string, any>, Record<string, any>>
 ) => {
     const connection = new signalR.HubConnectionBuilder()
@@ -34,9 +35,17 @@ export const connectToGameHub = (
         });
     });
 
-    connection.on('NotifyGameStart', (gameId: string) => {
+    connection.on('NotifyGameStart', (game: GameDto) => {
         console.log('game start');
-        router.navigate({ to: `/game/$gameId/room`, params: { gameId: gameId } });
+        router.navigate({ to: `/game/$gameId/room`, params: { gameId: game.id } });
+        queryClient.setQueryData<GameDto[]>(gameApiQueryKeys.games, (prev) => {
+            const next = [...(prev ?? [])];
+            const gameIndex = next.findIndex(x => x.id === game.id);
+            if(gameIndex>-1) {
+                next[gameIndex] = game;
+            }
+            return next;
+        });
     });
 
     connection.on('NotifyPlayerUpdated', (player: PlayerDto) => {
