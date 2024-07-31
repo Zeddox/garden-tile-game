@@ -12,22 +12,31 @@ public class GameDto : BaseDto<Guid>
     [Required]
     public GameStatus GameStatus { get; set; }
 
+    [Required]
     public Guid StartingPlayerId { get; set; }
 
+    [Required]
     public List<TileDto> FirstRoundTiles { get; set; }
 
+    [Required]
     public List<TileDto> SecondRoundTiles { get; set; }
 
+    [Required]
     public List<TileDto> ThirdRoundTiles { get; set; }
 
+    [Required]
     public List<TileDto> FourthRoundTiles { get; set; }
 
+    [Required]
     public List<TileDto> FifthRoundTiles { get; set; }
 
+    [Required]
     public List<TileDto> SixthRoundTiles { get; set; }
 
+    [Required]
     public IList<PlayerDto> Players { get; set; }
 
+    [Required]
     public List<TurnDto> Turns { get; set; }
 }
 

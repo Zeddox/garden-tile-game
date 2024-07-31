@@ -238,4 +238,51 @@ public class GameController : BaseController
 
         return Ok();
     }
+
+    /// <summary>
+    /// Create a new Game.
+    /// Client is notified of Game creation via SignalR
+    /// </summary>
+    /// <param name="dto">A Game DTO.</param>
+    [HttpPost("{gameId}")]
+    [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.PostReturnsNoContent))]
+    public async Task<ActionResult> RecordGameTurn(Guid gameId, [FromBody] TurnDto dto, CancellationToken cancellationToken)
+    {
+        var game = await _db.Games.FirstOrDefaultAsync(x => x.Id == gameId, cancellationToken);
+
+        if (game == null)
+        {
+            throw new Exception($"Game {gameId} could not be found");
+        }
+
+        var player = await _db.Players
+            .FirstOrDefaultAsync(x => x.Id == dto.PlayerId, cancellationToken);
+
+        if (player == null)
+        {
+            throw new Exception($"Player with ID {dto.PlayerId} could not be found");
+        }
+
+        var turn = new Turn
+        {
+            Round = dto.Round,
+            Layer = dto.Layer,
+            TileId = dto.TileId,
+            TurnNumber = dto.TurnNumber,
+            PlayerId = dto.PlayerId,
+            Rotation = dto.Rotation,
+            PositionX = dto.PositionX,
+            PositionY = dto.PositionY
+        };
+
+        // TODO Validate turn
+        game.Turns.Add(turn);
+
+        _db.Games.Update(game);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        await _gameHubContext.Clients.Group(gameId.ToString()).NotifyGameTurnRecorded(gameId, dto);
+
+        return NoContent();
+    }
 }

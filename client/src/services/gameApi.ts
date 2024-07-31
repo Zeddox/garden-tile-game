@@ -1,14 +1,25 @@
-import { ApiClient, CreateGameDto, ICreateGameDto, IGameDto, IUpdateGameDto, IUpdatePlayerDto, UpdateGameDto, UpdatePlayerDto } from '@/generated/backend';
+import {
+    ApiClient,
+    CreateGameDto,
+    ICreateGameDto,
+    IGameDto,
+    ITurnDto,
+    IUpdateGameDto,
+    IUpdatePlayerDto,
+    TurnDto,
+    UpdateGameDto,
+    UpdatePlayerDto
+} from '@/generated/backend';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-export interface ConnectionIdDto  {
+export interface ConnectionIdDto {
     oldConnectionId: string;
     newConnectionId: string;
 }
 
 export const gameApiQueryKeys = {
     games: ['games'],
-    game: (id:string ) => ['game', id],
+    game: (id: string) => ['game', id],
     playerByConnectionId: (id: string, gameId: string) => ['player', { id, gameId }]
 };
 
@@ -19,7 +30,7 @@ export const useGames = () => {
     });
 };
 
-export const useGame = (id:string) => {
+export const useGame = (id: string) => {
     return useQuery<IGameDto>({
         queryKey: gameApiQueryKeys.game(id),
         queryFn: () => new ApiClient('http://localhost:8020').game_GetGameById(id)
@@ -41,5 +52,11 @@ export const useUpdateGame = () => {
 export const useUpdatePlayer = () => {
     return useMutation<void, Error, IUpdatePlayerDto>({
         mutationFn: (dto) => new ApiClient('http://localhost:8020').game_UpdatePlayer(dto as UpdatePlayerDto)
+    });
+};
+
+export const useRecordGameTurn = (gameId: string) => {
+    return useMutation<void, Error, ITurnDto>({
+        mutationFn: (dto) => new ApiClient('http://localhost:8020').game_RecordGameTurn(gameId, dto as TurnDto)
     });
 };
