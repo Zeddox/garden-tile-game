@@ -25,12 +25,12 @@ public static class GameTiles
         .ToList();
 
     public static List<Tile> Triples = new List<Tile>()
-        .Concat(Enumerable.Range(1, 1).Select((_) => new Tile { Type = TileType.MapleTree, Shape = TileShape.Triple, TypePositionX = 1, TypePositionY = 0, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.Pagoda, Shape = TileShape.Triple, TypePositionX = 1, TypePositionY = 0, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.Fish, Shape = TileShape.Triple, TypePositionX = 1, TypePositionY = 0, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.AzaleaBush, Shape = TileShape.Triple, TypePositionX = 1, TypePositionY = 0, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.Boxwood, Shape = TileShape.Triple, TypePositionX = 1, TypePositionY = 0, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 1).Select((_) => new Tile { Type = TileType.Stone, Shape = TileShape.Triple, TypePositionX = 1, TypePositionY = 0, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 1).Select((_) => new Tile { Type = TileType.MapleTree, Shape = TileShape.Triple, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.Pagoda, Shape = TileShape.Triple, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.Fish, Shape = TileShape.Triple, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.AzaleaBush, Shape = TileShape.Triple, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.Boxwood, Shape = TileShape.Triple, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 1).Select((_) => new Tile { Type = TileType.Stone, Shape = TileShape.Triple, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
         .Concat(Enumerable.Range(1, 1).Select((_) => new Tile { Type = TileType.MapleTree, Shape = TileShape.Triple, TypePositionX = 0, TypePositionY = 0, TypeQuantity = 3 }))
         .Concat(Enumerable.Range(1, 1).Select((_) => new Tile { Type = TileType.Pagoda, Shape = TileShape.Triple, TypePositionX = 0, TypePositionY = 0, TypeQuantity = 3 }))
         .Concat(Enumerable.Range(1, 1).Select((_) => new Tile { Type = TileType.Fish, Shape = TileShape.Triple, TypePositionX = 0, TypePositionY = 0, TypeQuantity = 3 }))
@@ -40,11 +40,11 @@ public static class GameTiles
         .ToList();
 
     public static List<Tile> Corners = new List<Tile>()
-        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.MapleTree, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 3).Select((_) => new Tile { Type = TileType.Pagoda, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 3).Select((_) => new Tile { Type = TileType.Fish, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 3).Select((_) => new Tile { Type = TileType.AzaleaBush, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 3).Select((_) => new Tile { Type = TileType.Boxwood, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
-        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.Stone, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 1, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.MapleTree, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 0, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 3).Select((_) => new Tile { Type = TileType.Pagoda, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 0, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 3).Select((_) => new Tile { Type = TileType.Fish, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 0, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 3).Select((_) => new Tile { Type = TileType.AzaleaBush, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 0, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 3).Select((_) => new Tile { Type = TileType.Boxwood, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 0, TypeQuantity = 3 }))
+        .Concat(Enumerable.Range(1, 2).Select((_) => new Tile { Type = TileType.Stone, Shape = TileShape.Corner, TypePositionX = 0, TypePositionY = 0, TypeQuantity = 3 }))
         .ToList();
 }
