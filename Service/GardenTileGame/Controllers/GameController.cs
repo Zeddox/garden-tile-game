@@ -130,6 +130,7 @@ public class GameController : BaseController
 
         var players = await _db.Players
             .Where(x => x.GameId == id)
+            .OrderBy(x => x.Order)
             .ToListAsync(cancellationToken);
 
         game.Players = players;

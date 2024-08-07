@@ -1,9 +1,6 @@
 ﻿using GardentTileGame.Command;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
-using NSwag;
 
 namespace GardenTileGame.API;
 
