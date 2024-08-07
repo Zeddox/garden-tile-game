@@ -3,9 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GardenTileGame.API", "GardenTileGame\GardenTileGame.API.csproj", "{9E3DA7D2-EEB9-4BC1-A89E-1A5927B1BC06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GardenTileGame.API", "GardenTileGame\GardenTileGame.API.csproj", "{9E3DA7D2-EEB9-4BC1-A89E-1A5927B1BC06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GardenTileGame.Data", "GardenTileGame.Data\GardenTileGame.Data.csproj", "{33D9264D-D712-43DC-BCA0-EF5EB6777388}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GardenTileGame.Data", "GardenTileGame.Data\GardenTileGame.Data.csproj", "{33D9264D-D712-43DC-BCA0-EF5EB6777388}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GardenTileGame.Command", "GardentTileGame.Command\GardenTileGame.Command.csproj", "{ACA5C827-AA15-45CE-BBE4-CE7A2C86A039}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CD39E913-2418-464D-A5D3-F24F4CD7F181}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +28,10 @@ Global
 		{33D9264D-D712-43DC-BCA0-EF5EB6777388}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33D9264D-D712-43DC-BCA0-EF5EB6777388}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33D9264D-D712-43DC-BCA0-EF5EB6777388}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACA5C827-AA15-45CE-BBE4-CE7A2C86A039}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACA5C827-AA15-45CE-BBE4-CE7A2C86A039}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACA5C827-AA15-45CE-BBE4-CE7A2C86A039}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACA5C827-AA15-45CE-BBE4-CE7A2C86A039}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

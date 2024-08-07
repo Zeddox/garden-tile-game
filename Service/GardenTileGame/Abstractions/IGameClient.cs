@@ -5,8 +5,12 @@ namespace GardenTileGame.API.Abstractions;
 public interface IGameClient
 {
     Task NotifyGameCreated(GameDto game);
+
     Task NotifyPlayerAdded(PlayerDto player);
-    Task NotifyGameStart(string gameId);
+
+    Task NotifyGameStart(GameDto game);
+
     Task NotifyPlayerUpdated(PlayerDto player);
+
     Task NotifyPlayersConnectionIdUpdated(IEnumerable<UpdatePlayerConnectionIdDto> players);
 }

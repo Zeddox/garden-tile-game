@@ -23,6 +23,8 @@ public class PlayerDto : BaseDto<Guid>
 
     [Required]
     public string GamePieceColor { get; set; }
+
+    public int Order { get; set; }
 }
 
 public class UpdatePlayerDto
