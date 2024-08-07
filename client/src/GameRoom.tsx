@@ -8,8 +8,17 @@ import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, Car
 import { IGameDto, TileRotation } from './generated/backend';
 import { useGame, useRecordGameTurn } from './services/gameApi';
 import { useSelectedUser } from './useSelectedUser';
+import { ITileDto, TileShape } from './generated/backend';
+import { GamePiece } from './gamePieces/GamePiece';
 
 const route = getRouteApi('/game/$gameId/room');
+
+interface IGamePieces {
+    singlePieces: ITileDto[];
+    doublePieces: ITileDto[];
+    triplePieces: ITileDto[];
+    cornerPieces: ITileDto[];
+}
 
 export const GameRoom = () => {
     const { gameId } = route.useParams();
@@ -30,6 +39,15 @@ export const GameRoom = () => {
     const opponents = useMemo(() => {
         return game?.players.filter((player) => player.userId !== selectedUser?.id) ?? [];
     }, [game, selectedUser]);
+
+    const gamePieces: IGamePieces = useMemo(() => {
+        return {
+            singlePieces: game?.firstRoundTiles?.filter((piece) => piece.shape === TileShape.Single) ?? [],
+            doublePieces: game?.firstRoundTiles?.filter((piece) => piece.shape === TileShape.Double) ?? [],
+            triplePieces: game?.firstRoundTiles?.filter((piece) => piece.shape === TileShape.Triple) ?? [],
+            cornerPieces: game?.firstRoundTiles?.filter((piece) => piece.shape === TileShape.Corner) ?? []
+        };
+    }, [game]);
 
     const [api, setApi] = useState<CarouselApi>();
 
@@ -63,8 +81,17 @@ export const GameRoom = () => {
                             ))}
                         </div>
                     </div>
-                    <div className={'bg-slate w-3/4 flex-auto border-l border-white'}>
+                    <div className={'bg-slate h-full w-3/4 flex-auto border-l border-white'}>
                         <span className={'ml-5 text-xl'}>{'Round 1'}</span>
+                        <div className={'mt-10 flex content-center'}>
+                            {(Object.values(gamePieces) as ITileDto[][]).map((tiles) => (
+                                <div className={'flex w-1/4 flex-row flex-wrap justify-evenly'}>
+                                    {tiles.map((tile) => (
+                                        <GamePiece tileShape={TileShape.Single} size={10} tile={tile} />
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
                 <div className={'flex h-[55rem] gap-16'}>
