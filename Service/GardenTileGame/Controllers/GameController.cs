@@ -277,6 +277,10 @@ public class GameController : BaseController
         };
 
         // TODO Validate turn
+        if (game.Turns == null)
+        {
+            game.Turns = new List<Turn>();
+        }
         game.Turns.Add(turn);
 
         _db.Games.Update(game);

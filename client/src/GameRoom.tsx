@@ -34,7 +34,6 @@ export const GameRoom = () => {
     const myPlayer = game?.players.find((x) => x.userId === selectedUser?.id);
 
     const currentPlayer = getCurrentPlayer(game);
-    console.log({ currentPlayer });
 
     const opponents = useMemo(() => {
         return game?.players.filter((player) => player.userId !== selectedUser?.id) ?? [];
@@ -84,10 +83,10 @@ export const GameRoom = () => {
                     <div className={'bg-slate h-full w-3/4 flex-auto border-l border-white'}>
                         <span className={'ml-5 text-xl'}>{'Round 1'}</span>
                         <div className={'mt-10 flex content-center'}>
-                            {(Object.values(gamePieces) as ITileDto[][]).map((tiles) => (
-                                <div className={'flex w-1/4 flex-row flex-wrap justify-evenly'}>
+                            {(Object.values(gamePieces) as ITileDto[][]).map((tiles, i) => (
+                                <div key={i} className={'flex w-1/4 flex-row flex-wrap justify-evenly'}>
                                     {tiles.map((tile) => (
-                                        <GamePiece tileShape={TileShape.Single} size={10} tile={tile} />
+                                        <GamePiece key={tile.id} tileShape={TileShape.Single} size={10} tile={tile} />
                                     ))}
                                 </div>
                             ))}
@@ -155,13 +154,14 @@ export const GameRoom = () => {
 };
 
 const getCurrentPlayer = (game: IGameDto | undefined) => {
-    console.log({ game, last: game?.turns.sort((a, b) => b.turnNumber - a.turnNumber)[0].playerId });
     const lastTurnPlayer = game?.players.find(
-        (x) => x.id === game?.turns.sort((a, b) => b.turnNumber - a.turnNumber)[0].playerId
+        (x) => x.id === game?.turns.sort((a, b) => b.turnNumber - a.turnNumber)[0]?.playerId
     );
-    console.log({ lastTurnPlayer, orderEq: (lastTurnPlayer?.order ?? 0) < (game?.players.length ?? 0) });
-    if (lastTurnPlayer === undefined || game === undefined) {
+    if (game === undefined) {
         return undefined;
+    }
+    if (lastTurnPlayer === undefined) {
+        return game.players.find((x) => x.id === game.startingPlayerId);
     }
     if ((lastTurnPlayer.order ?? 0) < game.players.length) {
         return game.players.find((x) => x.order === (lastTurnPlayer.order ?? 0) + 1);
