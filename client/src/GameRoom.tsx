@@ -10,6 +10,7 @@ import { useGame, useRecordGameTurn } from './services/gameApi';
 import { useSelectedUser } from './useSelectedUser';
 import { ITileDto, TileShape } from './generated/backend';
 import { GamePiece } from './gamePieces/GamePiece';
+import { GameBoard } from './GameBoard';
 
 const route = getRouteApi('/game/$gameId/room');
 
@@ -94,7 +95,7 @@ export const GameRoom = () => {
                     </div>
                 </div>
                 <div className={'flex h-[55rem] gap-16'}>
-                    <Carousel className={'flex-1'} setApi={setApi}>
+                    <Carousel className={'flex-none'} setApi={setApi}>
                         <CarouselContent>
                             {opponents.map((player, index) => (
                                 <CarouselItem key={index}>
@@ -103,7 +104,11 @@ export const GameRoom = () => {
                                             className={
                                                 'mb-2 h-[55rem] border-slate-700/40 bg-[#fcfaec] bg-gradient-to-b from-[#fffbed] from-10% via-[#e0d8b4a6] via-60% to-[#e0d8b4a6] to-100% p-2 shadow-md shadow-slate-950'
                                             }
-                                        ></Card>
+                                        >
+                                                <div className={'content-center h-[90%]'}>
+                                                    <GameBoard size={11} />
+                                                </div>
+                                        </Card>
                                         <span className={'text-3xl font-extralight tracking-wider text-muted-foreground'}>
                                             {player.name}
                                         </span>
@@ -111,19 +116,16 @@ export const GameRoom = () => {
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        {opponents.length > 1 && (
-                            <div>
-                                <CarouselPrevious />
-                                <CarouselNext />
-                            </div>
-                        )}
                     </Carousel>
-                    <div className={'flex-1 text-center'}>
+                    <div className={'flex-none text-center'}>
                         <Card
                             className={
                                 'mb-2 h-[55rem] border-slate-700/40 bg-[#fcfaec] bg-gradient-to-b from-[#fffbed] from-10% via-[#e0d8b4a6] via-60% to-[#e0d8b4a6] to-100% p-2 shadow-md shadow-slate-950'
                             }
                         >
+                            <div className={'content-center h-[90%]'}>
+                                <GameBoard size={11} />
+                            </div>
                             {currentPlayer?.id === myPlayer?.id ? (
                                 <Button
                                     onClick={() =>
