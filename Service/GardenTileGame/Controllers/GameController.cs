@@ -130,6 +130,7 @@ public class GameController : BaseController
 
         var players = await _db.Players
             .Where(x => x.GameId == id)
+            .OrderBy(x => x.Order)
             .ToListAsync(cancellationToken);
 
         game.Players = players;
@@ -276,6 +277,10 @@ public class GameController : BaseController
         };
 
         // TODO Validate turn
+        if (game.Turns == null)
+        {
+            game.Turns = new List<Turn>();
+        }
         game.Turns.Add(turn);
 
         _db.Games.Update(game);
