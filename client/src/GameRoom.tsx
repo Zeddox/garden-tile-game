@@ -1,16 +1,15 @@
 import { getRouteApi } from '@tanstack/react-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCrown } from 'react-icons/fa';
 import { LoadingSpinner } from './components/loading/LoadingSpinner';
 import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
-import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './components/ui/carousel';
-import { IGameDto, TileRotation } from './generated/backend';
+import { Carousel, CarouselApi, CarouselContent, CarouselItem } from './components/ui/carousel';
+import { GameBoard } from './GameBoard';
+import { GamePiece } from './gamePieces/GamePiece';
+import { IGameDto, ITileDto, TileRotation, TileShape } from './generated/backend';
 import { useGame, useRecordGameTurn } from './services/gameApi';
 import { useSelectedUser } from './useSelectedUser';
-import { ITileDto, TileShape } from './generated/backend';
-import { GamePiece } from './gamePieces/GamePiece';
-import { GameBoard } from './GameBoard';
 
 const route = getRouteApi('/game/$gameId/room');
 
@@ -58,7 +57,22 @@ export const GameRoom = () => {
         currentPlayer !== undefined && api?.scrollTo(opponents.findIndex((x) => x.id === currentPlayer.id));
     }, [api, currentPlayer, opponents]);
 
-    return game === undefined || selectedUser === undefined ? (
+    const onPlacePiece = useCallback(
+        (placement: { x: number; y: number }) =>
+            recordTurn({
+                playerId: myPlayer!.id,
+                round: 1,
+                turnNumber: game!.turns!.length + 1,
+                layer: 1,
+                positionX: placement.x,
+                positionY: placement.y,
+                rotation: TileRotation.Zero,
+                tileId: game!.firstRoundTiles[0].id
+            }),
+        [game, myPlayer, recordTurn]
+    );
+
+    return game === undefined || selectedUser === undefined || myPlayer === undefined ? (
         <div className={'flex items-center justify-center'}>
             <LoadingSpinner />
         </div>
@@ -105,9 +119,9 @@ export const GameRoom = () => {
                                                 'mb-2 h-[55rem] border-slate-700/40 bg-[#fcfaec] bg-gradient-to-b from-[#fffbed] from-10% via-[#e0d8b4a6] via-60% to-[#e0d8b4a6] to-100% p-2 shadow-md shadow-slate-950'
                                             }
                                         >
-                                                <div className={'content-center h-[90%]'}>
-                                                    <GameBoard size={11} />
-                                                </div>
+                                            <div className={'h-[90%] content-center'}>
+                                                <GameBoard game={game} player={player} onPlacePiece={() => {}} />
+                                            </div>
                                         </Card>
                                         <span className={'text-3xl font-extralight tracking-wider text-muted-foreground'}>
                                             {player.name}
@@ -123,8 +137,8 @@ export const GameRoom = () => {
                                 'mb-2 h-[55rem] border-slate-700/40 bg-[#fcfaec] bg-gradient-to-b from-[#fffbed] from-10% via-[#e0d8b4a6] via-60% to-[#e0d8b4a6] to-100% p-2 shadow-md shadow-slate-950'
                             }
                         >
-                            <div className={'content-center h-[90%]'}>
-                                <GameBoard size={11} />
+                            <div className={'h-[90%] content-center'}>
+                                <GameBoard game={game} player={myPlayer} onPlacePiece={onPlacePiece} />
                             </div>
                             {currentPlayer?.id === myPlayer?.id ? (
                                 <Button
