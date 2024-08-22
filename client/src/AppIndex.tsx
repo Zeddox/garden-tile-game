@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router';
-import './App.css';
 import { useGames } from './services/gameApi';
 import { GameCreationDialog } from './GameCreationDialog';
 import { Card } from './components/ui/card';

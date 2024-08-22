@@ -1,6 +1,15 @@
+import { ITileDto, ITurnDto } from '@/generated/backend';
+
 export type GameCellState = {
     isHighlighted: boolean;
     //isValidForPlacement: boolean;
+};
+
+export type GamePieces = {
+    singlePieces: ITileDto[];
+    doublePieces: ITileDto[];
+    triplePieces: ITileDto[];
+    cornerPieces: ITileDto[];
 };
 
 export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[]) => {

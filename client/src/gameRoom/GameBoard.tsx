@@ -4,7 +4,7 @@ import { GiCirclingFish, GiFlowers, GiFruitTree, GiLindenLeaf, GiMushroomHouse, 
 import { getGameBoardCellsFromPlayerTurns } from './game';
 import { GameBoardCell } from './GameBoardCell';
 import { GameBoardContext, makeGameBoardAtoms } from './gameBoardContext';
-import { IGameDto, IPlayerDto, ITurnDto } from './generated/backend';
+import { IGameDto, IPlayerDto, ITurnDto } from '../generated/backend';
 import { useGameBoardContext } from './useGameBoardContext';
 
 export const GameBoard = (props: {

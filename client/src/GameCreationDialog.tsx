@@ -1,7 +1,6 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useAtom } from 'jotai';
 import { useContext, useState } from 'react';
-import './App.css';
 import { AppContext } from './appContext';
 import { Button } from './components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader } from './components/ui/dialog';

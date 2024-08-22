@@ -1,52 +1,52 @@
+import { GamePieceSection } from '@/gamePieces/GamePieceSection';
 import { getRouteApi } from '@tanstack/react-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FaCrown } from 'react-icons/fa';
-import { LoadingSpinner } from './components/loading/LoadingSpinner';
-import { Button } from './components/ui/button';
-import { Card } from './components/ui/card';
-import { Carousel, CarouselApi, CarouselContent, CarouselItem } from './components/ui/carousel';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { LoadingSpinner } from '../components/loading/LoadingSpinner';
+import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
+import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '../components/ui/carousel';
+import { IGameDto, IUserDto, TileRotation } from '../generated/backend';
+import { useGame, useRecordGameTurn } from '../services/gameApi';
+import { useSelectedUser } from '../useSelectedUser';
 import { GameBoard } from './GameBoard';
-import { GamePiece } from './gamePieces/GamePiece';
-import { IGameDto, ITileDto, TileRotation, TileShape } from './generated/backend';
-import { useGame, useRecordGameTurn } from './services/gameApi';
-import { useSelectedUser } from './useSelectedUser';
+import { GamePlayersSection } from './GamePlayersSection';
+import { GameRoomContext, makeGameRoomAtoms } from './gameRoomContext';
+import { useGameRoomContext } from './useGameRoomContext';
 
 const route = getRouteApi('/game/$gameId/room');
-
-interface IGamePieces {
-    singlePieces: ITileDto[];
-    doublePieces: ITileDto[];
-    triplePieces: ITileDto[];
-    cornerPieces: ITileDto[];
-}
 
 export const GameRoom = () => {
     const { gameId } = route.useParams();
     const selectedUser = useSelectedUser();
 
     const { data: game } = useGame(gameId);
-    const { mutate: recordTurn } = useRecordGameTurn(gameId);
-
-    const players = useMemo(() => {
-        return game?.players ?? [];
-    }, [game]);
 
     const myPlayer = game?.players.find((x) => x.userId === selectedUser?.id);
 
-    const currentPlayer = getCurrentPlayer(game);
+    return game === undefined || selectedUser === undefined || myPlayer === undefined ? (
+        <div className={'flex items-center justify-center'}>
+            <LoadingSpinner />
+        </div>
+    ) : (
+        <GameRoomContextProvider game={game} selectedUser={selectedUser}>
+            <GameRoomInner />
+        </GameRoomContextProvider>
+    );
+};
+const GameRoomInner = () => {
+    const { gameAtom, myPlayerAtom, currentPlayerAtom } = useGameRoomContext();
+    const game = useAtomValue(gameAtom);
+    const currentPlayer = useAtomValue(currentPlayerAtom);
+    const selectedUser = useSelectedUser()!;
+
+    const { mutate: recordTurn } = useRecordGameTurn(game.id);
+
+    const myPlayer = useAtomValue(myPlayerAtom);
 
     const opponents = useMemo(() => {
         return game?.players.filter((player) => player.userId !== selectedUser?.id) ?? [];
     }, [game, selectedUser]);
-
-    const gamePieces: IGamePieces = useMemo(() => {
-        return {
-            singlePieces: game?.firstRoundTiles?.filter((piece) => piece.shape === TileShape.Single) ?? [],
-            doublePieces: game?.firstRoundTiles?.filter((piece) => piece.shape === TileShape.Double) ?? [],
-            triplePieces: game?.firstRoundTiles?.filter((piece) => piece.shape === TileShape.Triple) ?? [],
-            cornerPieces: game?.firstRoundTiles?.filter((piece) => piece.shape === TileShape.Corner) ?? []
-        };
-    }, [game]);
 
     const [api, setApi] = useState<CarouselApi>();
 
@@ -72,41 +72,12 @@ export const GameRoom = () => {
         [game, myPlayer, recordTurn]
     );
 
-    return game === undefined || selectedUser === undefined || myPlayer === undefined ? (
-        <div className={'flex items-center justify-center'}>
-            <LoadingSpinner />
-        </div>
-    ) : (
+    return (
         <div>
             <div className={'mx-auto h-[50rem] w-full max-w-screen-2xl'}>
                 <div className={'mb-5 mt-5 flex h-[15rem]'}>
-                    <div className={'bg-slate w-1/4 flex-auto border-slate-700/40'}>
-                        <span className={'text-xl'}>{'Players'}</span>
-                        <div className={'mt-4 grid auto-rows-auto'}>
-                            {players.map((player) => (
-                                <div
-                                    key={player.id}
-                                    className={`flex items-center gap-3 ${player.gameLeader ? 'bg-[--primary-50] p-1' : ''}`}
-                                >
-                                    <span>{player.name}</span>
-                                    <span className={'h-4 w-4 rounded-sm'} style={{ background: player.gamePieceColor }}></span>
-                                    {player.gameLeader ? <FaCrown /> : null}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div className={'bg-slate h-full w-3/4 flex-auto border-l border-white'}>
-                        <span className={'ml-5 text-xl'}>{'Round 1'}</span>
-                        <div className={'mt-10 flex content-center'}>
-                            {(Object.values(gamePieces) as ITileDto[][]).map((tiles, i) => (
-                                <div key={i} className={'flex w-1/4 flex-row flex-wrap justify-evenly'}>
-                                    {tiles.map((tile) => (
-                                        <GamePiece key={tile.id} tileShape={TileShape.Single} size={10} tile={tile} />
-                                    ))}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <GamePlayersSection />
+                    <GamePieceSection />
                 </div>
                 <div className={'flex h-[55rem] gap-16'}>
                     <Carousel className={'flex-none'} setApi={setApi}>
@@ -167,6 +138,36 @@ export const GameRoom = () => {
             </div>
         </div>
     );
+};
+
+const GameRoomContextProvider = (props: { game: IGameDto; selectedUser: IUserDto; children: React.ReactNode }) => {
+    const atoms = useRef(makeGameRoomAtoms({ game: props.game, selectedUser: props.selectedUser }));
+
+    return (
+        <GameRoomContext.Provider value={atoms.current}>
+            <GameRoomContextUpdater game={props.game} />
+            {props.children}
+        </GameRoomContext.Provider>
+    );
+};
+
+const GameRoomContextUpdater = (props: { game: IGameDto }) => {
+    const { gameAtom, currentPlayerAtom } = useGameRoomContext();
+
+    const setGame = useSetAtom(gameAtom);
+    const setCurrentPlayer = useSetAtom(currentPlayerAtom);
+
+    const currentPlayer = getCurrentPlayer(props.game);
+
+    useEffect(() => {
+        setGame(props.game);
+    }, [props.game, setGame]);
+
+    useEffect(() => {
+        setCurrentPlayer(currentPlayer);
+    }, [currentPlayer, setCurrentPlayer]);
+
+    return null;
 };
 
 const getCurrentPlayer = (game: IGameDto | undefined) => {

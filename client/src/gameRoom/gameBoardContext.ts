@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import React from 'react';
 import { GameCellState, getGameBoardCellsFromPlayerTurns } from './game';
-import { ITurnDto } from './generated/backend';
+import { ITurnDto } from '../generated/backend';
 
 export type GameBoardContextValue = ReturnType<typeof makeGameBoardAtoms>;
 
