@@ -241,10 +241,10 @@ public class GameController : BaseController
     }
 
     /// <summary>
-    /// Create a new Game.
-    /// Client is notified of Game creation via SignalR
+    /// Record game turn.
+    /// Client is notified of recorded turn via SignalR
     /// </summary>
-    /// <param name="dto">A Game DTO.</param>
+    /// <param name="dto">A Turn DTO.</param>
     [HttpPost("{gameId}")]
     [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.PostReturnsNoContent))]
     public async Task<ActionResult> RecordGameTurn(Guid gameId, [FromBody] TurnDto dto, CancellationToken cancellationToken)
