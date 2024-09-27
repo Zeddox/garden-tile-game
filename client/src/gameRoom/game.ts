@@ -2,7 +2,7 @@ import { ITileDto, ITurnDto } from '@/generated/backend';
 
 export type GameCellState = {
     isHighlighted: boolean;
-    //isValidForPlacement: boolean;
+    isValidForPlacement?: boolean;
 };
 
 export type GamePieces = {

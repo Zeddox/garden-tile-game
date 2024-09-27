@@ -17,6 +17,7 @@ export const GamePieceSection = () => {
             cornerPieces: game?.firstRoundTiles?.filter((piece) => piece.shape === TileShape.Corner) ?? []
         };
     }, [game]);
+    
     return (
         <div className={'bg-slate h-full w-3/4 flex-auto border-l border-white'}>
             <span className={'ml-5 text-xl'}>{'Round 1'}</span>

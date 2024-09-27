@@ -35,10 +35,11 @@ export const GameRoom = () => {
     );
 };
 const GameRoomInner = () => {
-    const { gameAtom, myPlayerAtom, currentPlayerAtom } = useGameRoomContext();
+    const { gameAtom, myPlayerAtom, currentPlayerAtom, selectedPieceAtom } = useGameRoomContext();
     const game = useAtomValue(gameAtom);
     const currentPlayer = useAtomValue(currentPlayerAtom);
     const selectedUser = useSelectedUser()!;
+    const selectedPiece = useAtomValue(selectedPieceAtom);
 
     const { mutate: recordTurn } = useRecordGameTurn(game.id);
 
@@ -67,7 +68,7 @@ const GameRoomInner = () => {
                 positionX: placement.x,
                 positionY: placement.y,
                 rotation: TileRotation.Zero,
-                tileId: game!.firstRoundTiles[0].id
+                tileId: selectedPiece!.id
             }),
         [game, myPlayer, recordTurn]
     );
@@ -156,7 +157,7 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
 
     const setGame = useSetAtom(gameAtom);
     const setCurrentPlayer = useSetAtom(currentPlayerAtom);
-
+    
     const currentPlayer = getCurrentPlayer(props.game);
 
     useEffect(() => {
