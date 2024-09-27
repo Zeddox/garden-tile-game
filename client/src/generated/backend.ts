@@ -694,11 +694,11 @@ export enum GameStatus {
 }
 
 export class TileDto extends BaseDtoOfGuid implements ITileDto {
-    type?: TileType;
-    shape?: TileShape;
-    typePositionX?: number;
-    typePositionY?: number;
-    typeQuantity?: number;
+    type!: TileType;
+    shape!: TileShape;
+    typePositionX!: number;
+    typePositionY!: number;
+    typeQuantity!: number;
 
     constructor(data?: ITileDto) {
         super(data);
@@ -735,11 +735,11 @@ export class TileDto extends BaseDtoOfGuid implements ITileDto {
 }
 
 export interface ITileDto extends IBaseDtoOfGuid {
-    type?: TileType;
-    shape?: TileShape;
-    typePositionX?: number;
-    typePositionY?: number;
-    typeQuantity?: number;
+    type: TileType;
+    shape: TileShape;
+    typePositionX: number;
+    typePositionY: number;
+    typeQuantity: number;
 }
 
 export enum TileType {

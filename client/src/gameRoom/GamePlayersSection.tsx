@@ -1,15 +1,24 @@
 import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
 import { FaCrown } from 'react-icons/fa';
 import { useGameRoomContext } from './useGameRoomContext';
+import { IGameDto } from '@/generated/backend';
 
 export const GamePlayersSection = () => {
-    const { gameAtom } = useGameRoomContext();
+    const { gameAtom, currentPlayerAtom } = useGameRoomContext();
     const game = useAtomValue(gameAtom);
+    const currentPlayer = useAtomValue(currentPlayerAtom);
 
-    const players = useMemo(() => {
-        return game?.players ?? [];
-    }, [game]);
+    const players = game.players;
+
+    const scores = game.turns.reduce((scores, x) => {
+        const tile = getRoundTiles(game, x.round).find((t) => t.id === x.tileId);
+        if (tile) {
+            const turnScore = tile.typeQuantity * x.layer;
+
+            scores.set(x.playerId, (scores.get(x.playerId) ?? 0) + turnScore);
+        }
+        return scores;
+    }, new Map<string, number>());
 
     return (
         <div className={'bg-slate w-1/4 flex-auto border-slate-700/40'}>
@@ -18,14 +27,37 @@ export const GamePlayersSection = () => {
                 {players.map((player) => (
                     <div
                         key={player.id}
-                        className={`flex items-center gap-3 ${player.gameLeader ? 'bg-[--primary-50] p-1' : ''}`}
+                        data-is-current-player={player.id === currentPlayer?.id}
+                        className={'flex justify-between p-1 px-3 data-[is-current-player="true"]:bg-[--primary-50]'}
                     >
-                        <span>{player.name}</span>
-                        <span className={'h-4 w-4 rounded-sm'} style={{ background: player.gamePieceColor }}></span>
-                        {player.gameLeader ? <FaCrown /> : null}
+                        <div className={'flex items-center gap-3'}>
+                            <span className={'h-4 w-4 rounded-sm'} style={{ background: player.gamePieceColor }}></span>
+                            <span>{player.name}</span>
+                            {player.gameLeader ? <FaCrown /> : null}
+                        </div>
+                        <div className={'font-semibold'}>{scores.get(player.id) ?? 0}</div>
                     </div>
                 ))}
             </div>
         </div>
     );
+};
+
+const getRoundTiles = (game: IGameDto, round: number) => {
+    switch (round) {
+        case 1:
+            return game.firstRoundTiles;
+        case 2:
+            return game.secondRoundTiles;
+        case 3:
+            return game.thirdRoundTiles;
+        case 4:
+            return game.fourthRoundTiles;
+        case 5:
+            return game.fifthRoundTiles;
+        case 6:
+            return game.sixthRoundTiles;
+        default:
+            return [];
+    }
 };
