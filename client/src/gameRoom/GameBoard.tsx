@@ -1,23 +1,24 @@
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import React, { useEffect, useRef } from 'react';
 import { GiCirclingFish, GiFlowers, GiFruitTree, GiLindenLeaf, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
-import { getGameBoardCellsFromPlayerTurns } from './game';
+import { IGameDto, IPlayerDto, ITurnDto } from '../generated/backend';
+import { getGameBoardCellsFromPlayerTurns, getTileMap } from './game';
 import { GameBoardCell } from './GameBoardCell';
 import { GameBoardContext, makeGameBoardAtoms } from './gameBoardContext';
-import { IGameDto, IPlayerDto, ITurnDto } from '../generated/backend';
 import { useGameBoardContext } from './useGameBoardContext';
+import { useGameRoomContext } from './useGameRoomContext';
 
 export const GameBoard = (props: {
     game: IGameDto;
     player: IPlayerDto;
-    onPlacePiece: (placement: { x: number; y: number }) => void;
+    onPlacePiece: (placement: { x: number; y: number; layer: number }) => void;
 }) => {
     const playerTurns = props.game.turns
         .filter((x) => x.playerId === props.player.id)
         .sort((a, b) => a.turnNumber - b.turnNumber);
 
     return (
-        <GameBoardContextProvider playerTurns={playerTurns} onPlacePiece={props.onPlacePiece}>
+        <GameBoardContextProvider player={props.player} playerTurns={playerTurns} onPlacePiece={props.onPlacePiece}>
             <GameBoardInner />
         </GameBoardContextProvider>
     );
@@ -73,32 +74,44 @@ const GameBoardInner = () => {
 };
 
 const GameBoardContextProvider = (props: {
+    player: IPlayerDto;
     playerTurns: ITurnDto[];
-    onPlacePiece: (placement: { x: number; y: number }) => void;
+    onPlacePiece: (placement: { x: number; y: number; layer: number }) => void;
     children: React.ReactNode;
 }) => {
-    const atoms = useRef(makeGameBoardAtoms({ playerTurns: props.playerTurns, onPlacePiece: props.onPlacePiece }));
+    const game = useAtomValue(useGameRoomContext().gameAtom);
+    const atoms = useRef(
+        makeGameBoardAtoms({
+            playerTurns: props.playerTurns,
+            onPlacePiece: props.onPlacePiece,
+            player: props.player,
+            tileMap: getTileMap(game)
+        })
+    );
 
     return (
         <GameBoardContext.Provider value={atoms.current}>
-            <GameBoardContextUpdater playerTurns={props.playerTurns} onPlacePiece={props.onPlacePiece} />
+            <GameBoardContextUpdater player={props.player} playerTurns={props.playerTurns} onPlacePiece={props.onPlacePiece} />
             {props.children}
         </GameBoardContext.Provider>
     );
 };
 
 const GameBoardContextUpdater = (props: {
+    player: IPlayerDto;
     playerTurns: ITurnDto[];
-    onPlacePiece: (placement: { x: number; y: number }) => void;
+    onPlacePiece: (placement: { x: number; y: number; layer: number }) => void;
 }) => {
+    const { gameAtom } = useGameRoomContext();
     const { gameBoardCellMapAtom, placePieceCallbackAtom } = useGameBoardContext();
 
     const setGameBoardCellMap = useSetAtom(gameBoardCellMapAtom);
     const setPlacePieceCallback = useSetAtom(placePieceCallbackAtom);
+    const game = useAtomValue(gameAtom);
 
     useEffect(() => {
-        setGameBoardCellMap(getGameBoardCellsFromPlayerTurns(props.playerTurns));
-    }, [props.playerTurns, setGameBoardCellMap]);
+        setGameBoardCellMap(getGameBoardCellsFromPlayerTurns(props.playerTurns, props.player, getTileMap(game)));
+    }, [game, props.player, props.playerTurns, setGameBoardCellMap]);
 
     useEffect(() => {
         setPlacePieceCallback(() => props.onPlacePiece);

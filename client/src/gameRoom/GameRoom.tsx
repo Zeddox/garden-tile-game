@@ -59,18 +59,18 @@ const GameRoomInner = () => {
     }, [api, currentPlayer, opponents]);
 
     const onPlacePiece = useCallback(
-        (placement: { x: number; y: number }) =>
+        (placement: { x: number; y: number; layer: number }) =>
             recordTurn({
                 playerId: myPlayer!.id,
                 round: 1,
                 turnNumber: game!.turns!.length + 1,
-                layer: 1,
+                layer: placement.layer,
                 positionX: placement.x,
                 positionY: placement.y,
                 rotation: TileRotation.Zero,
                 tileId: selectedPiece!.id
             }),
-        [game, myPlayer, recordTurn]
+        [game, myPlayer, recordTurn, selectedPiece]
     );
 
     return (
@@ -157,7 +157,7 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
 
     const setGame = useSetAtom(gameAtom);
     const setCurrentPlayer = useSetAtom(currentPlayerAtom);
-    
+
     const currentPlayer = getCurrentPlayer(props.game);
 
     useEffect(() => {

@@ -1,15 +1,20 @@
+import { TileShape } from '@/generated/backend';
 import { atom } from 'jotai';
 import React from 'react';
 import { GameCellState } from './game';
 import { GameBoardContextValue } from './gameBoardContext';
 import { GameRoomContextValue } from './gameRoomContext';
-import { TileShape, TileType } from '@/generated/backend';
 
 export type GameBoardCellContextValue = ReturnType<typeof makeGameBoardCellAtoms>;
 
 export const GameBoardCellContext = React.createContext<GameBoardCellContextValue | undefined>(undefined);
 
-export const makeGameBoardCellAtoms = (state: { x: number; y: number; gameBoardContext: GameBoardContextValue; gameRoomContext: GameRoomContextValue; }) => {
+export const makeGameBoardCellAtoms = (state: {
+    x: number;
+    y: number;
+    gameBoardContext: GameBoardContextValue;
+    gameRoomContext: GameRoomContextValue;
+}) => {
     const { gameBoardCellMapAtom } = state.gameBoardContext;
     const { selectedPieceAtom } = state.gameRoomContext;
 
@@ -19,9 +24,9 @@ export const makeGameBoardCellAtoms = (state: { x: number; y: number; gameBoardC
             const selectedPiece = get(selectedPieceAtom);
 
             if (selectedPiece) {
-                const next = new Map(get(gameBoardCellMapAtom));            
+                const next = new Map(get(gameBoardCellMapAtom));
                 next.get(state.x)!.set(state.y, cellState);
-                
+
                 const current = next.get(state.x)!.get(state.y)!;
                 current.isValidForPlacement = true;
 
@@ -32,7 +37,7 @@ export const makeGameBoardCellAtoms = (state: { x: number; y: number; gameBoardC
                         other.isValidForPlacement = true;
                         next.get(state.x + 1)!.set(state.y, { ...other });
                     } else {
-                        console.log("test");
+                        console.log('test');
                         current.isValidForPlacement = false;
                     }
                 }
@@ -40,7 +45,6 @@ export const makeGameBoardCellAtoms = (state: { x: number; y: number; gameBoardC
                 if (selectedPiece.shape === TileShape.Triple) {
                     const other = next.get(state.x)?.get(state.y + 1);
                     const nextOther = next.get(state.x)?.get(state.y + 2);
-                    
 
                     if (other && nextOther) {
                         other.isHighlighted = cellState.isHighlighted;
@@ -63,7 +67,7 @@ export const makeGameBoardCellAtoms = (state: { x: number; y: number; gameBoardC
                     }
                 }
 
-                if (selectedPiece.shape === TileShape.Corner ) {
+                if (selectedPiece.shape === TileShape.Corner) {
                     const nextX = next.get(state.x + 1);
                     const otherY = next.get(state.x)?.get(state.y + 1);
 

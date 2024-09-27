@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { FaCrown } from 'react-icons/fa';
+import { getRoundTiles } from './game';
 import { useGameRoomContext } from './useGameRoomContext';
-import { IGameDto } from '@/generated/backend';
 
 export const GamePlayersSection = () => {
     const { gameAtom, currentPlayerAtom } = useGameRoomContext();
@@ -41,23 +41,4 @@ export const GamePlayersSection = () => {
             </div>
         </div>
     );
-};
-
-const getRoundTiles = (game: IGameDto, round: number) => {
-    switch (round) {
-        case 1:
-            return game.firstRoundTiles;
-        case 2:
-            return game.secondRoundTiles;
-        case 3:
-            return game.thirdRoundTiles;
-        case 4:
-            return game.fourthRoundTiles;
-        case 5:
-            return game.fifthRoundTiles;
-        case 6:
-            return game.sixthRoundTiles;
-        default:
-            return [];
-    }
 };

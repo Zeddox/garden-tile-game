@@ -1,8 +1,8 @@
 import { useGameRoomContext } from '@/gameRoom/useGameRoomContext';
 import { ITileDto, TileShape, TileType } from '@/generated/backend';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { useMemo } from 'react';
-import { GiFruitTree, GiMushroomHouse, GiFlowers, GiLindenLeaf, GiStonePile, GiCirclingFish } from 'react-icons/gi';
+import { GiCirclingFish, GiFlowers, GiFruitTree, GiLindenLeaf, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
 
 export const GamePiece = (props: { tileShape: TileShape; size: number; tile?: ITileDto }) => {
     const { size, tile } = props;
@@ -30,17 +30,17 @@ export const GamePiece = (props: { tileShape: TileShape; size: number; tile?: IT
 
         switch (tile?.type) {
             case TileType.AzaleaBush:
-                return <GiFlowers className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'}/>;
+                return <GiFlowers className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'} />;
             case TileType.Boxwood:
-                return <GiLindenLeaf className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'}/>;
+                return <GiLindenLeaf className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'} />;
             case TileType.Fish:
-                return <GiCirclingFish className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'}/>;
+                return <GiCirclingFish className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'} />;
             case TileType.MapleTree:
-                return <GiFruitTree className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'}/>;
+                return <GiFruitTree className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'} />;
             case TileType.Pagoda:
-                return <GiMushroomHouse className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'}/>;
+                return <GiMushroomHouse className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'} />;
             default:
-                return <GiStonePile className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'}/>;
+                return <GiStonePile className={styles} color={selectedPiece?.id === tile?.id ? '#7dbd9f' : 'white'} />;
         }
     }, [tile, selectedPiece]);
 
