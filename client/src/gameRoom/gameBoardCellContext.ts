@@ -1,7 +1,7 @@
 import { TileShape } from '@/generated/backend';
 import { atom } from 'jotai';
 import React from 'react';
-import { GameCellState } from './game';
+import { GameCellState, getCellType } from './game';
 import { GameBoardContextValue } from './gameBoardContext';
 import { GameRoomContextValue } from './gameRoomContext';
 
@@ -22,22 +22,22 @@ export const makeGameBoardCellAtoms = (state: {
         (get) => get(gameBoardCellMapAtom).get(state.x)!.get(state.y)!,
         (get, set, cellState: GameCellState) => {
             const selectedPiece = get(selectedPieceAtom);
+            const cellType = getCellType(state.y);
 
             if (selectedPiece) {
                 const next = new Map(get(gameBoardCellMapAtom));
                 next.get(state.x)!.set(state.y, cellState);
 
                 const current = next.get(state.x)!.get(state.y)!;
-                current.isValidForPlacement = true;
+                current.isValidForPlacement = cellType === selectedPiece.type;
 
                 if (selectedPiece.shape === TileShape.Double) {
                     if (next.get(state.x + 1)) {
                         const other = next.get(state.x + 1)!.get(state.y)!;
                         other.isHighlighted = cellState.isHighlighted;
-                        other.isValidForPlacement = true;
+                        other.isValidForPlacement = current.isValidForPlacement && true;
                         next.get(state.x + 1)!.set(state.y, { ...other });
                     } else {
-                        console.log('test');
                         current.isValidForPlacement = false;
                     }
                 }
@@ -48,10 +48,10 @@ export const makeGameBoardCellAtoms = (state: {
 
                     if (other && nextOther) {
                         other.isHighlighted = cellState.isHighlighted;
-                        other.isValidForPlacement = true;
+                        other.isValidForPlacement = current.isValidForPlacement && true;
 
                         nextOther.isHighlighted = cellState.isHighlighted;
-                        nextOther.isValidForPlacement = true;
+                        nextOther.isValidForPlacement = current.isValidForPlacement && true;
 
                         next.get(state.x)!.set(state.y + 1, { ...other });
                         next.get(state.x)!.set(state.y + 2, { ...nextOther });
@@ -74,10 +74,10 @@ export const makeGameBoardCellAtoms = (state: {
                     if (nextX && otherY) {
                         const otherX = next.get(state.x + 1)!.get(state.y)!;
                         otherY.isHighlighted = cellState.isHighlighted;
-                        otherY.isValidForPlacement = true;
+                        otherY.isValidForPlacement = current.isValidForPlacement && true;
 
                         otherX.isHighlighted = cellState.isHighlighted;
-                        otherX.isValidForPlacement = true;
+                        otherX.isValidForPlacement = current.isValidForPlacement && true;
 
                         next.get(state.x + 1)!.set(state.y, { ...otherX });
                         next.get(state.x)!.set(state.y + 1, { ...otherY });

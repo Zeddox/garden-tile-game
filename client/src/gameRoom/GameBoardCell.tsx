@@ -1,11 +1,11 @@
-import { useMemo, useRef } from 'react';
-import { GameBoardCellContext, makeGameBoardCellAtoms } from './gameBoardCellContext';
-import { useGameBoardContext } from './useGameBoardContext';
-import { useGameBoardCellContext } from './useGameBoardCellState';
-import { useAtom, useSetAtom } from 'jotai';
-import { useGameRoomContext } from './useGameRoomContext';
 import { TileType } from '@/generated/backend';
-import { GiFlowers, GiLindenLeaf, GiCirclingFish, GiFruitTree, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
+import { useAtom, useSetAtom } from 'jotai';
+import { useMemo, useRef } from 'react';
+import { GiCirclingFish, GiFlowers, GiFruitTree, GiLindenLeaf, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
+import { GameBoardCellContext, makeGameBoardCellAtoms } from './gameBoardCellContext';
+import { useGameBoardCellContext } from './useGameBoardCellState';
+import { useGameBoardContext } from './useGameBoardContext';
+import { useGameRoomContext } from './useGameRoomContext';
 
 export const GameBoardCell = (props: { x: number; y: number }) => {
     return (
@@ -21,7 +21,7 @@ const GameBoardCellInner = (props: { x: number; y: number }) => {
     const [cellState, setCellState] = useAtom(cellContext.gameCellStateAtom);
     const placePiece = useSetAtom(gameBoardContext.placePieceAtom);
 
-    console.log(cellState);
+    props.x === 3 && props.y === 3 && console.log({ cellState });
 
     const tileIcon = useMemo(() => {
         const styles = `w-full h-full`;
@@ -49,7 +49,9 @@ const GameBoardCellInner = (props: { x: number; y: number }) => {
             data-is-highlighted={cellState.isHighlighted}
             data-is-valid={cellState.isValidForPlacement !== false}
             data-is-occupied={cellState.layer !== undefined}
-            className={`h-24 w-24 border-white bg-[#d2b48c24] ${props.y < 5 ? 'border-b-2' : ''} ${props.x < 5 ? 'border-r-2' : ''} data-[is-highlighted="true"]:data-[is-valid="false"]:bg-red-200 data-[is-highlighted="true"]:data-[is-valid="true"]:bg-[--primary-150] data-[is-occupied="true"]:bg-[--primary-60]`}
+            data-is-interior-x={props.x < 5}
+            data-is-interior-y={props.y < 5}
+            className={`h-24 w-24 border-white bg-[#d2b48c24] data-[is-interior-x="true"]:border-r-2 data-[is-interior-y="true"]:border-b-2 data-[is-highlighted="true"]:data-[is-valid="false"]:bg-red-200 data-[is-highlighted="true"]:data-[is-valid="true"]:bg-[--primary-150] data-[is-occupied="true"]:bg-[--primary-60]`}
             onMouseOver={() => {
                 setCellState({ ...cellState, isHighlighted: true });
             }}

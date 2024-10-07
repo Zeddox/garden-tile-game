@@ -9,6 +9,7 @@ import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '../compone
 import { IGameDto, IUserDto, TileRotation } from '../generated/backend';
 import { useGame, useRecordGameTurn } from '../services/gameApi';
 import { useSelectedUser } from '../useSelectedUser';
+import { getRoundAndRoundPiecesFromPlayerTurns } from './game';
 import { GameBoard } from './GameBoard';
 import { GamePlayersSection } from './GamePlayersSection';
 import { GameRoomContext, makeGameRoomAtoms } from './gameRoomContext';
@@ -35,11 +36,12 @@ export const GameRoom = () => {
     );
 };
 const GameRoomInner = () => {
-    const { gameAtom, myPlayerAtom, currentPlayerAtom, selectedPieceAtom } = useGameRoomContext();
+    const { gameAtom, myPlayerAtom, currentPlayerAtom, selectedPieceAtom, removePieceAtom } = useGameRoomContext();
     const game = useAtomValue(gameAtom);
     const currentPlayer = useAtomValue(currentPlayerAtom);
     const selectedUser = useSelectedUser()!;
     const selectedPiece = useAtomValue(selectedPieceAtom);
+    const removePiece = useSetAtom(removePieceAtom);
 
     const { mutate: recordTurn } = useRecordGameTurn(game.id);
 
@@ -59,18 +61,28 @@ const GameRoomInner = () => {
     }, [api, currentPlayer, opponents]);
 
     const onPlacePiece = useCallback(
-        (placement: { x: number; y: number; layer: number }) =>
-            recordTurn({
-                playerId: myPlayer!.id,
-                round: 1,
-                turnNumber: game!.turns!.length + 1,
-                layer: placement.layer,
-                positionX: placement.x,
-                positionY: placement.y,
-                rotation: TileRotation.Zero,
-                tileId: selectedPiece!.id
-            }),
-        [game, myPlayer, recordTurn, selectedPiece]
+        (placement: { x: number; y: number; layer: number }) => {
+            if (selectedPiece !== undefined) {
+                recordTurn(
+                    {
+                        playerId: myPlayer!.id,
+                        round: 1,
+                        turnNumber: game!.turns!.length + 1,
+                        layer: placement.layer,
+                        positionX: placement.x,
+                        positionY: placement.y,
+                        rotation: TileRotation.Zero,
+                        tileId: selectedPiece!.id
+                    },
+                    {
+                        onSuccess: () => {
+                            removePiece(selectedPiece);
+                        }
+                    }
+                );
+            }
+        },
+        [game, myPlayer, recordTurn, removePiece, selectedPiece]
     );
 
     return (
@@ -153,10 +165,13 @@ const GameRoomContextProvider = (props: { game: IGameDto; selectedUser: IUserDto
 };
 
 const GameRoomContextUpdater = (props: { game: IGameDto }) => {
-    const { gameAtom, currentPlayerAtom } = useGameRoomContext();
+    const { gameAtom, currentPlayerAtom, roundAtom, roundPiecesAtom, maxRoundAtom } = useGameRoomContext();
 
     const setGame = useSetAtom(gameAtom);
     const setCurrentPlayer = useSetAtom(currentPlayerAtom);
+    const setRound = useSetAtom(roundAtom);
+    const setRoundPieces = useSetAtom(roundPiecesAtom);
+    const maxRound = useAtomValue(maxRoundAtom);
 
     const currentPlayer = getCurrentPlayer(props.game);
 
@@ -167,6 +182,12 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
     useEffect(() => {
         setCurrentPlayer(currentPlayer);
     }, [currentPlayer, setCurrentPlayer]);
+
+    useEffect(() => {
+        const { round, roundPieces } = getRoundAndRoundPiecesFromPlayerTurns(props.game, props.game.turns, maxRound);
+        setRound(round);
+        setRoundPieces(roundPieces);
+    }, [maxRound, props.game, setRound, setRoundPieces]);
 
     return null;
 };
