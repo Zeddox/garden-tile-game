@@ -4,8 +4,8 @@ import { useAtom } from 'jotai';
 import { useMemo } from 'react';
 import { GiCirclingFish, GiFlowers, GiFruitTree, GiLindenLeaf, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
 
-export const GamePiece = (props: { tileShape: TileShape; size: number; tile?: ITileDto }) => {
-    const { size, tile } = props;
+export const GamePiece = (props: { tileShape: TileShape; size: number; tile?: ITileDto; rotation: 0 | 90 | 180 | 270 }) => {
+    const { size, tile, rotation } = props;
 
     const { selectedPieceAtom } = useGameRoomContext();
 
@@ -45,11 +45,15 @@ export const GamePiece = (props: { tileShape: TileShape; size: number; tile?: IT
     }, [tile, selectedPiece]);
 
     return (
-        <div className={`grid grid-cols-${columnNumber} h-fit w-fit`} onClick={() => setSelectedPiece(tile)}>
+        <div
+            style={{ '--piece-rotation': `${rotation}deg` } as React.CSSProperties}
+            className={`grid grid-cols-${columnNumber} h-fit w-fit rotate-[--piece-rotation] transition-transform`}
+            onClick={() => setSelectedPiece(tile)}
+        >
             {Array.from({ length: tile?.shape === TileShape.Corner ? 3 : columnNumber }).map((_, index) => (
                 <div
                     key={index}
-                    className={`w-${size} h-${size} ${selectedPiece?.id === tile?.id ? 'bg-white' : 'bg-[--primary-130]'} ${tile?.shape === TileShape.Corner && index === 2 ? 'col-start-2' : ''}`}
+                    className={`w-${size} h-${size} ${selectedPiece?.id === tile?.id ? 'bg-white' : 'bg-[--primary-130]'} ${tile?.shape === TileShape.Corner && index === 3 ? 'col-start-2 row-start-2' : ''}`}
                 >
                     {index === tile?.typePositionY && tileIcon}
                 </div>

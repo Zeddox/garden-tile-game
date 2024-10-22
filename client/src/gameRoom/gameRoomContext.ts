@@ -14,6 +14,7 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
     const currentPlayerAtom = atom<IPlayerDto | undefined>(undefined);
 
     const selectedPieceAtom = atom<ITileDto | undefined>(undefined);
+    const selectedPieceRotationAtom = atom<0 | 90 | 180 | 270>(0);
     const roundAtom = atom<number>(1);
     const maxRoundAtom = atom<number>(state.game.players.length >= 4 ? 4 : state.game.players.length >= 3 ? 5 : 6);
     const roundPiecesAtom = atom<ITileDto[]>(getRoundTiles(state.game, 1));
@@ -45,6 +46,7 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
         roundAtom,
         maxRoundAtom,
         roundPiecesAtom,
-        removePieceAtom
+        removePieceAtom,
+        selectedPieceRotationAtom
     };
 };
