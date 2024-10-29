@@ -1,7 +1,7 @@
-import { TileShape } from '@/generated/backend';
+import { ITileDto, TileShape } from '@/generated/backend';
 import { atom } from 'jotai';
 import React from 'react';
-import { GameCellState, getCellType } from './game';
+import { GameCellState, getCellType, getCornerPieceRotatedOffsets, getDoublePieceRotatedOffsets, getTriplePieceRotatedOffsets } from './game';
 import { GameBoardContextValue } from './gameBoardContext';
 import { GameRoomContextValue } from './gameRoomContext';
 
@@ -17,11 +17,13 @@ export const makeGameBoardCellAtoms = (state: {
 }) => {
     const { gameBoardCellMapAtom } = state.gameBoardContext;
     const { selectedPieceAtom } = state.gameRoomContext;
+    const { selectedPieceRotationAtom } = state.gameRoomContext;
 
     const gameCellStateAtom = atom(
         (get) => get(gameBoardCellMapAtom).get(state.x)!.get(state.y)!,
         (get, set, cellState: GameCellState) => {
             const selectedPiece = get(selectedPieceAtom);
+            const selectedPieceRotation = get(selectedPieceRotationAtom);
             const cellType = getCellType(state.y);
 
             if (selectedPiece === undefined) {
@@ -35,69 +37,81 @@ export const makeGameBoardCellAtoms = (state: {
             current.isValidForPlacement = cellType === selectedPiece.type;
 
             if (selectedPiece.shape === TileShape.Double) {
-                if (next.get(state.x + 1)) {
-                    const other = next.get(state.x + 1)!.get(state.y)!;
+                const offset = getDoublePieceRotatedOffsets(selectedPieceRotation);
+                const otherX = next.get(state.x + offset.other[0]);
+                const otherY = otherX?.get(state.y + offset.other[1]);
+
+                if (otherX && otherY) {
+                    const other = otherY;
                     other.isHighlighted = cellState.isHighlighted;
                     other.isValidForPlacement = current.isValidForPlacement && true;
-                    next.get(state.x + 1)!.set(state.y, { ...other });
+                    otherX.set(state.y + offset.other[1], { ...other });
                 } else {
                     current.isValidForPlacement = false;
                 }
             }
 
             if (selectedPiece.shape === TileShape.Triple) {
-                const other = next.get(state.x)?.get(state.y + 1);
-                const nextOther = next.get(state.x)?.get(state.y + 2);
+                const offset = getTriplePieceRotatedOffsets(selectedPiece, selectedPieceRotation);
 
-                if (other && nextOther) {
-                    other.isHighlighted = cellState.isHighlighted;
-                    other.isValidForPlacement = current.isValidForPlacement && true;
+                const otherA = next.get(state.x + offset.otherA[0])?.get(state.y + offset.otherA[1]);
+                const otherB = next.get(state.x + offset.otherB[0])?.get(state.y + offset.otherB[1]);
 
-                    nextOther.isHighlighted = cellState.isHighlighted;
-                    nextOther.isValidForPlacement = current.isValidForPlacement && true;
+                if (otherA && otherB) {
+                    otherA.isHighlighted = cellState.isHighlighted;
+                    otherA.isValidForPlacement = current.isValidForPlacement && true;
 
-                    next.get(state.x)!.set(state.y + 1, { ...other });
-                    next.get(state.x)!.set(state.y + 2, { ...nextOther });
+                    otherB.isHighlighted = cellState.isHighlighted;
+                    otherB.isValidForPlacement = current.isValidForPlacement && true;
+
+                    next.get(state.x + offset.otherA[0])!.set(state.y + offset.otherA[1], { ...otherA });
+                    next.get(state.x + offset.otherB[0])!.set(state.y + offset.otherB[1], { ...otherB });
                 } else {
                     current.isValidForPlacement = false;
 
-                    if (other) {
-                        other.isHighlighted = cellState.isHighlighted;
-                        other.isValidForPlacement = false;
+                    if (otherA) {
+                        otherA.isHighlighted = cellState.isHighlighted;
+                        otherA.isValidForPlacement = false;
 
-                        next.get(state.x)!.set(state.y + 1, { ...other });
+                        next.get(state.x + offset.otherA[0])!.set(state.y + offset.otherA[1], { ...otherA });
+                    }
+
+                    if (otherB) {
+                        otherB.isHighlighted = cellState.isHighlighted;
+                        otherB.isValidForPlacement = false;
+
+                        next.get(state.x + offset.otherB[0])!.set(state.y + offset.otherB[1], { ...otherB });
                     }
                 }
             }
 
             if (selectedPiece.shape === TileShape.Corner) {
-                const nextX = next.get(state.x + 1);
-                const otherY = next.get(state.x)?.get(state.y + 1);
+                const offset = getCornerPieceRotatedOffsets(selectedPieceRotation);
+                const otherX = next.get(state.x + offset.otherX[0])?.get(state.y + offset.otherX[1]);
+                const otherY = next.get(state.x + offset.otherY[0])?.get(state.y + offset.otherY[1]);
 
-                if (nextX && otherY) {
-                    const otherX = next.get(state.x + 1)!.get(state.y)!;
+                if (otherX && otherY) {
                     otherY.isHighlighted = cellState.isHighlighted;
                     otherY.isValidForPlacement = current.isValidForPlacement && true;
 
                     otherX.isHighlighted = cellState.isHighlighted;
                     otherX.isValidForPlacement = current.isValidForPlacement && true;
 
-                    next.get(state.x + 1)!.set(state.y, { ...otherX });
-                    next.get(state.x)!.set(state.y + 1, { ...otherY });
+                    next.get(state.x + offset.otherX[0])!.set(state.y + offset.otherX[1], { ...otherX });
+                    next.get(state.x + offset.otherY[0])!.set(state.y + offset.otherY[1], { ...otherY });
                 } else {
                     current.isValidForPlacement = false;
 
-                    if (nextX) {
-                        const otherX = next.get(state.x + 1)!.get(state.y)!;
+                    if (otherX) {
                         otherX.isHighlighted = cellState.isHighlighted;
                         otherX.isValidForPlacement = false;
-                        next.get(state.x + 1)!.set(state.y, { ...otherX });
+                        next.get(state.x + offset.otherX[0])!.set(state.y + offset.otherX[1], { ...otherX });
                     }
 
                     if (otherY) {
                         otherY.isHighlighted = cellState.isHighlighted;
                         otherY.isValidForPlacement = false;
-                        next.get(state.x)!.set(state.y + 1, { ...otherY });
+                        next.get(state.x + offset.otherY[0])!.set(state.y + offset.otherY[1], { ...otherY });
                     }
                 }
             }

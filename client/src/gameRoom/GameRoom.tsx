@@ -36,11 +36,12 @@ export const GameRoom = () => {
     );
 };
 const GameRoomInner = () => {
-    const { gameAtom, myPlayerAtom, currentPlayerAtom, selectedPieceAtom, removePieceAtom } = useGameRoomContext();
+    const { gameAtom, myPlayerAtom, currentPlayerAtom, selectedPieceAtom, removePieceAtom, selectedPieceRotationAtom } = useGameRoomContext();
     const game = useAtomValue(gameAtom);
     const currentPlayer = useAtomValue(currentPlayerAtom);
     const selectedUser = useSelectedUser()!;
     const selectedPiece = useAtomValue(selectedPieceAtom);
+    const selectedPieceRotation = useAtomValue(selectedPieceRotationAtom);
     const removePiece = useSetAtom(removePieceAtom);
 
     const { mutate: recordTurn } = useRecordGameTurn(game.id);
@@ -71,7 +72,13 @@ const GameRoomInner = () => {
                         layer: placement.layer,
                         positionX: placement.x,
                         positionY: placement.y,
-                        rotation: TileRotation.Zero,
+                        rotation: selectedPieceRotation === 0
+                            ? TileRotation.Zero
+                            : selectedPieceRotation === 90
+                            ? TileRotation.Ninety
+                            : selectedPieceRotation === 180
+                            ? TileRotation.OneHundredEighty
+                            : TileRotation.TwoHunderedSeventy,
                         tileId: selectedPiece!.id
                     },
                     {
@@ -82,7 +89,7 @@ const GameRoomInner = () => {
                 );
             }
         },
-        [game, myPlayer, recordTurn, removePiece, selectedPiece]
+        [game, myPlayer, recordTurn, removePiece, selectedPiece, selectedPieceRotation]
     );
 
     return (
