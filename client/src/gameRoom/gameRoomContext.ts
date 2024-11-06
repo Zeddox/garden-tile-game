@@ -36,6 +36,8 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
         } else {
             set(roundPiecesAtom, next);
         }
+        set(selectedPieceAtom, undefined);
+        set(selectedPieceRotationAtom, 0);
     });
 
     return {

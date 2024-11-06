@@ -1,7 +1,13 @@
-import { ITileDto, TileShape } from '@/generated/backend';
+import { TileShape } from '@/generated/backend';
 import { atom } from 'jotai';
 import React from 'react';
-import { GameCellState, getCellType, getCornerPieceRotatedOffsets, getDoublePieceRotatedOffsets, getTriplePieceRotatedOffsets } from './game';
+import {
+    GameCellState,
+    getCellType,
+    getCornerPieceRotatedOffsets,
+    getDoublePieceRotatedOffsets,
+    getTriplePieceRotatedOffsets
+} from './game';
 import { GameBoardContextValue } from './gameBoardContext';
 import { GameRoomContextValue } from './gameRoomContext';
 
