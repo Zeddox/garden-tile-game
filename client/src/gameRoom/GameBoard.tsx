@@ -8,25 +8,28 @@ import { GameBoardContext, makeGameBoardAtoms } from './gameBoardContext';
 import { useGameBoardContext } from './useGameBoardContext';
 import { useGameRoomContext } from './useGameRoomContext';
 
-export const GameBoard = (props: {
+type GameBoardProps = {
     game: IGameDto;
     player: IPlayerDto;
+    isMyPlayer?: boolean;
     onPlacePiece: (placement: { x: number; y: number; layer: number }) => void;
-}) => {
+};
+
+export const GameBoard = (props: GameBoardProps) => {
     const playerTurns = props.game.turns
         .filter((x) => x.playerId === props.player.id)
         .sort((a, b) => a.turnNumber - b.turnNumber);
 
     return (
         <GameBoardContextProvider player={props.player} playerTurns={playerTurns} onPlacePiece={props.onPlacePiece}>
-            <GameBoardInner />
+            <GameBoardInner {...props} />
         </GameBoardContextProvider>
     );
 };
 
-const GameBoardInner = () => {
+const GameBoardInner = (props: GameBoardProps) => {
     const getRowIcon = (index: number) => {
-        const styles = 'w-full h-full';
+        const styles = 'w-full h-full text-slate-500';
 
         switch (index) {
             case 0:
@@ -48,16 +51,16 @@ const GameBoardInner = () => {
             <div className={'mb-5 ml-[7.25rem] grid w-fit grid-cols-6'}>
                 {Array.from({ length: 6 }).map((_, index) => (
                     <div key={index} className={`h-12 w-24 p-2`}>
-                        <div className={'h-full w-full border-2 border-red-500 bg-[#d2b48c24]'}></div>
+                        <div className={'h-full w-full border-2 border-[--primary-60] bg-[#d2b48c24]'}></div>
                     </div>
                 ))}
             </div>
             <div className={'flex w-fit flex-row'}>
-                <div className={'mr-4 grid grid-rows-6 border-2 border-red-500'}>
+                <div className={'mr-4 grid grid-rows-6 border-2 border-[--primary-60]'}>
                     {Array.from({ length: 6 }).map((_, index) => (
                         <div
                             key={index}
-                            className={`h-24 w-24 bg-[#d2b48c24] p-2 ${index !== 0 ? 'border-t-2 border-red-500' : ''}`}
+                            className={`h-24 w-24 bg-[#d2b48c24] p-2 ${index !== 0 ? 'border-t-2 border-[--primary-60]' : ''}`}
                         >
                             {getRowIcon(index)}
                         </div>
@@ -65,7 +68,9 @@ const GameBoardInner = () => {
                 </div>
                 <div className={`grid aspect-square w-fit grid-cols-6 border-2 border-white`}>
                     {Array.from({ length: 6 }).map((_, y) =>
-                        Array.from({ length: 6 }).map((_, x) => <GameBoardCell key={`(${x}, ${y})`} x={x} y={y} />)
+                        Array.from({ length: 6 }).map((_, x) => (
+                            <GameBoardCell key={`(${x}, ${y})`} x={x} y={y} viewOnly={props.isMyPlayer !== true} />
+                        ))
                     )}
                 </div>
             </div>

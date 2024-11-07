@@ -138,7 +138,7 @@ const GameRoomInner = () => {
                             }
                         >
                             <div className={'h-[90%] content-center'}>
-                                <GameBoard game={game} player={myPlayer} onPlacePiece={onPlacePiece} />
+                                <GameBoard game={game} player={myPlayer} isMyPlayer onPlacePiece={onPlacePiece} />
                             </div>
                             <div className={'text-slate-500'}>
                                 {currentPlayer?.id === myPlayer?.id
