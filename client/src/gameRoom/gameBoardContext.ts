@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import React from 'react';
-import { GameCellState, getGameBoardCellsFromPlayerTurns } from './game';
+import { ColumnData, GameCellState, getGameBoardCellsFromPlayerTurns, initColumnData } from './game';
 import { IPlayerDto, ITurnDto, TileDto } from '../generated/backend';
 
 export type GameBoardContextValue = ReturnType<typeof makeGameBoardAtoms>;
@@ -23,9 +23,12 @@ export const makeGameBoardAtoms = (state: {
         callback?.(placement);
     });
 
+    const columnDataAtom = atom<ColumnData[]>(initColumnData());
+
     return {
         gameBoardCellMapAtom,
         placePieceCallbackAtom,
-        placePieceAtom
+        placePieceAtom,
+        columnDataAtom
     };
 };

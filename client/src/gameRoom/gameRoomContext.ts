@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import React from 'react';
 import { IGameDto, IPlayerDto, ITileDto, IUserDto } from '../generated/backend';
-import { getRoundTiles } from './game';
+import { ColumnData, getRoundTiles, initColumnData } from './game';
 
 export type GameRoomContextValue = ReturnType<typeof makeGameRoomAtoms>;
 
@@ -37,7 +37,7 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
             set(roundPiecesAtom, next);
         }
     });
-
+    
     return {
         gameAtom,
         myPlayerAtom,

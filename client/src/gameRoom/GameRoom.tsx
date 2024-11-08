@@ -1,6 +1,6 @@
 import { GamePieceSection } from '@/gamePieces/GamePieceSection';
 import { getRouteApi } from '@tanstack/react-router';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LoadingSpinner } from '../components/loading/LoadingSpinner';
 import { Button } from '../components/ui/button';
@@ -61,6 +61,7 @@ const GameRoomInner = () => {
         currentPlayer !== undefined && api?.scrollTo(opponents.findIndex((x) => x.id === currentPlayer.id));
     }, [api, currentPlayer, opponents]);
 
+    // use positionX and round to derive column
     const onPlacePiece = useCallback(
         (placement: { x: number; y: number; layer: number }) => {
             if (selectedPiece !== undefined) {

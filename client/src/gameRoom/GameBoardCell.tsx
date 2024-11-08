@@ -19,6 +19,7 @@ const GameBoardCellInner = (props: { x: number; y: number }) => {
     const gameBoardContext = useGameBoardContext();
     const cellContext = useGameBoardCellContext();
     const [cellState, setCellState] = useAtom(cellContext.gameCellStateAtom);
+    const [columnData, setColumnData] = useAtom(gameBoardContext.columnDataAtom);
     const placePiece = useSetAtom(gameBoardContext.placePieceAtom);
 
     props.x === 3 && props.y === 3 && console.log({ cellState });
@@ -61,6 +62,9 @@ const GameBoardCellInner = (props: { x: number; y: number }) => {
             }}
             onMouseDown={() => {
                 placePiece({ x: props.x, y: props.y, layer: (cellState.layer ?? 0) + 1 });
+                const placedColumn = columnData.find(x => x.index === props.x);
+                placedColumn!.isUsed = true;
+                setColumnData(columnData);
             }}
         >
             <div className={'relative flex items-center justify-center'}>

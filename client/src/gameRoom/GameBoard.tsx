@@ -25,6 +25,9 @@ export const GameBoard = (props: {
 };
 
 const GameBoardInner = () => {
+    const { columnDataAtom } = useGameBoardContext();
+    const columnData = useAtomValue(columnDataAtom);
+
     const getRowIcon = (index: number) => {
         const styles = 'w-full h-full';
 
@@ -48,7 +51,7 @@ const GameBoardInner = () => {
             <div className={'mb-5 ml-[7.25rem] grid w-fit grid-cols-6'}>
                 {Array.from({ length: 6 }).map((_, index) => (
                     <div key={index} className={`h-12 w-24 p-2`}>
-                        <div className={'h-full w-full border-2 border-red-500 bg-[#d2b48c24]'}></div>
+                        <div data-is-used={columnData.find(x => x.index === index)!.isUsed} className={'h-full w-full border-2 border-red-500 data-[is-used="false"]:bg-[#d2b48c24] data-[is-used="true"]:bg-[--primary-150]'}></div>
                     </div>
                 ))}
             </div>

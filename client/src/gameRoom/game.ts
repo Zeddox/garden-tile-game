@@ -32,6 +32,11 @@ export type GameboardCornerPieceOffsets = {
     otherY: [number, number]
 };
 
+export type ColumnData = {
+    index: number;
+    isUsed: boolean;
+}
+
 export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player: IPlayerDto, tileMap: Map<string, TileDto>) => {
     const gameBoardCellsState = new Map<number, Map<number, GameCellState>>(
         new Map(
@@ -290,4 +295,11 @@ export const getRotationFromTileRotationEnum = (tileRotation: TileRotation) => {
         default:
             return 0;
     }
+};
+
+export const initColumnData: () => ColumnData[] = () => {
+    return Array.from({ length: 6 }).map((_, i) => ({
+        index: i,
+        isUsed: false
+    }));
 };

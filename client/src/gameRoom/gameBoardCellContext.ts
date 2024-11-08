@@ -41,13 +41,20 @@ export const makeGameBoardCellAtoms = (state: {
                 const otherX = next.get(state.x + offset.other[0]);
                 const otherY = otherX?.get(state.y + offset.other[1]);
 
-                if (otherX && otherY) {
+                if (otherX && otherY && (otherY.layer === current.layer)) {
                     const other = otherY;
                     other.isHighlighted = cellState.isHighlighted;
                     other.isValidForPlacement = current.isValidForPlacement && true;
                     otherX.set(state.y + offset.other[1], { ...other });
                 } else {
                     current.isValidForPlacement = false;
+
+                    if (otherX && otherY) {
+                        otherY.isHighlighted = cellState.isHighlighted;
+                        otherY.isValidForPlacement = false;
+
+                        otherX.set(state.y + offset.other[1], { ...otherY });
+                    }
                 }
             }
 
@@ -57,7 +64,7 @@ export const makeGameBoardCellAtoms = (state: {
                 const otherA = next.get(state.x + offset.otherA[0])?.get(state.y + offset.otherA[1]);
                 const otherB = next.get(state.x + offset.otherB[0])?.get(state.y + offset.otherB[1]);
 
-                if (otherA && otherB) {
+                if (otherA && otherB && current.layer === otherA.layer && current.layer === otherB.layer) {
                     otherA.isHighlighted = cellState.isHighlighted;
                     otherA.isValidForPlacement = current.isValidForPlacement && true;
 
@@ -90,7 +97,7 @@ export const makeGameBoardCellAtoms = (state: {
                 const otherX = next.get(state.x + offset.otherX[0])?.get(state.y + offset.otherX[1]);
                 const otherY = next.get(state.x + offset.otherY[0])?.get(state.y + offset.otherY[1]);
 
-                if (otherX && otherY) {
+                if (otherX && otherY && current.layer === otherX.layer && current.layer === otherY.layer) {
                     otherY.isHighlighted = cellState.isHighlighted;
                     otherY.isValidForPlacement = current.isValidForPlacement && true;
 
