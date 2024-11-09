@@ -1,7 +1,13 @@
-import { ITileDto, TileShape } from '@/generated/backend';
+import { TileShape } from '@/generated/backend';
 import { atom } from 'jotai';
 import React from 'react';
-import { GameCellState, getCellType, getCornerPieceRotatedOffsets, getDoublePieceRotatedOffsets, getTriplePieceRotatedOffsets } from './game';
+import {
+    GameCellState,
+    getCellType,
+    getCornerPieceRotatedOffsets,
+    getDoublePieceRotatedOffsets,
+    getTriplePieceRotatedOffsets
+} from './game';
 import { GameBoardContextValue } from './gameBoardContext';
 import { GameRoomContextValue } from './gameRoomContext';
 
@@ -15,15 +21,18 @@ export const makeGameBoardCellAtoms = (state: {
     gameBoardContext: GameBoardContextValue;
     gameRoomContext: GameRoomContextValue;
 }) => {
-    const { gameBoardCellMapAtom } = state.gameBoardContext;
-    const { selectedPieceAtom } = state.gameRoomContext;
-    const { selectedPieceRotationAtom } = state.gameRoomContext;
+    const { gameBoardCellMapAtom, playerAtom } = state.gameBoardContext;
+    const { selectedPieceAtom, selectedPieceRotationAtom, playerColumnStateAtom } = state.gameRoomContext;
 
     const gameCellStateAtom = atom(
         (get) => get(gameBoardCellMapAtom).get(state.x)!.get(state.y)!,
         (get, set, cellState: GameCellState) => {
             const selectedPiece = get(selectedPieceAtom);
             const selectedPieceRotation = get(selectedPieceRotationAtom);
+            const playerColumnState = get(playerColumnStateAtom);
+            const currentPlayer = get(playerAtom);
+            const currentPlayerColumnState = playerColumnState.get(currentPlayer.id) ?? [];
+
             const cellType = getCellType(state.y);
 
             if (selectedPiece === undefined) {
@@ -34,7 +43,7 @@ export const makeGameBoardCellAtoms = (state: {
             next.get(state.x)!.set(state.y, cellState);
 
             const current = next.get(state.x)!.get(state.y)!;
-            current.isValidForPlacement = cellType === selectedPiece.type;
+            current.isValidForPlacement = cellType === selectedPiece.type && !currentPlayerColumnState.includes(state.x);
 
             if (selectedPiece.shape === TileShape.Double) {
                 const offset = getDoublePieceRotatedOffsets(selectedPieceRotation);

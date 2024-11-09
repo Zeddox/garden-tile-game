@@ -16,20 +16,20 @@ export type GamePieces = {
 };
 
 export type GameboardDoublePieceOffsets = {
-    origin: [number, number],
-    other: [number, number]
+    origin: [number, number];
+    other: [number, number];
 };
 
 export type GameboardTriplePieceOffsets = {
-    origin: [number, number],
-    otherA: [number, number], //in the case of type being in the middle, other is always to the right
-    otherB: [number, number]
+    origin: [number, number];
+    otherA: [number, number]; //in the case of type being in the middle, other is always to the right
+    otherB: [number, number];
 };
 
 export type GameboardCornerPieceOffsets = {
-    origin: [number, number],
-    otherX: [number, number], 
-    otherY: [number, number]
+    origin: [number, number];
+    otherX: [number, number];
+    otherY: [number, number];
 };
 
 export type ColumnData = {
@@ -62,7 +62,9 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
 
                 if (tile.shape === TileShape.Double) {
                     const offest = getDoublePieceRotatedOffsets(rotation);
-                    const other = gameBoardCellsState.get(turn.positionX + offest.other[0])!.get(turn.positionY + offest.other[1]);
+                    const other = gameBoardCellsState
+                        .get(turn.positionX + offest.other[0])!
+                        .get(turn.positionY + offest.other[1]);
                     if (other) {
                         other.layer = turn.layer;
                     }
@@ -70,8 +72,12 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
 
                 if (tile.shape === TileShape.Triple) {
                     const offset = getTriplePieceRotatedOffsets(tile, rotation);
-                    const otherA = gameBoardCellsState.get(turn.positionX + offset.otherA[0])?.get(turn.positionY + offset.otherA[1]);
-                    const otherB = gameBoardCellsState.get(turn.positionX + offset.otherB[0])?.get(turn.positionY + offset.otherB[1]);
+                    const otherA = gameBoardCellsState
+                        .get(turn.positionX + offset.otherA[0])
+                        ?.get(turn.positionY + offset.otherA[1]);
+                    const otherB = gameBoardCellsState
+                        .get(turn.positionX + offset.otherB[0])
+                        ?.get(turn.positionY + offset.otherB[1]);
 
                     if (otherA && otherB) {
                         otherA.layer = turn.layer;
@@ -81,8 +87,12 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
 
                 if (tile.shape === TileShape.Corner) {
                     const offset = getCornerPieceRotatedOffsets(rotation);
-                    const otherX = gameBoardCellsState.get(turn.positionX + offset.otherX[0])?.get(turn.positionY + offset.otherX[1]);
-                    const otherY = gameBoardCellsState.get(turn.positionX + offset.otherY[0])?.get(turn.positionY + offset.otherY[1]);
+                    const otherX = gameBoardCellsState
+                        .get(turn.positionX + offset.otherX[0])
+                        ?.get(turn.positionY + offset.otherX[1]);
+                    const otherY = gameBoardCellsState
+                        .get(turn.positionX + offset.otherY[0])
+                        ?.get(turn.positionY + offset.otherY[1]);
 
                     if (otherX) {
                         otherX.layer = turn.layer;
@@ -98,6 +108,10 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
     return gameBoardCellsState;
 };
 
+export const getGameBoardColumnStateFromPlayerTunrs = (playerTurns: ITurnDto[], player: IPlayerDto) => {
+
+}
+
 export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurns: ITurnDto[], maxRound: number) => {
     const turns = playerTurns.sort((a, b) => a.turnNumber - b.turnNumber);
     const round = turns.reduce((round, turn) => {
@@ -106,8 +120,16 @@ export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurn
         }
         return round;
     }, 1);
-    const result = { round: round, roundPieces: getRoundTiles(game, round) };
+
+    const result = { round: round, roundPieces: getRoundTiles(game, round), playerColumnState: new Map<string, number[]>() };
     for (const turn of turns.filter((x) => x.round === round)) {
+        if (!result.playerColumnState.has(turn.playerId)) {
+            result.playerColumnState.set(turn.playerId, []);
+        }
+
+        const playerColumnState = result.playerColumnState.get(turn.playerId);
+        playerColumnState!.push(turn.positionX);
+
         const pieceIndex = result.roundPieces.findIndex((x) => x.id === turn.tileId);
         if (pieceIndex >= 0) {
             result.roundPieces.splice(pieceIndex, 1);
@@ -118,6 +140,7 @@ export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurn
         if (result.round < maxRound) {
             result.round += 1;
             result.roundPieces = getRoundTiles(game, result.round);
+            result.playerColumnState.clear();
         } else {
             console.log('GAME OVER');
         }
@@ -177,38 +200,43 @@ export const getCellType = (y: number) => {
     }
 };
 
-export const getDoublePieceRotatedOffsets: (selectedPieceRotation: 0 | 90 | 180 | 270 | 360)  => GameboardDoublePieceOffsets = (selectedPieceRotation: 0 | 90 | 180 | 270 | 360) => {
+export const getDoublePieceRotatedOffsets: (selectedPieceRotation: 0 | 90 | 180 | 270 | 360) => GameboardDoublePieceOffsets = (
+    selectedPieceRotation: 0 | 90 | 180 | 270 | 360
+) => {
     switch (selectedPieceRotation) {
         case 0:
         case 360:
             return {
                 origin: [0, 0],
                 other: [1, 0]
-            }
+            };
         case 90:
             return {
                 origin: [0, 0],
                 other: [0, 1]
-            }
+            };
         case 180:
             return {
                 origin: [0, 0],
                 other: [-1, 0]
-            }
+            };
         case 270:
             return {
                 origin: [0, 0],
                 other: [0, -1]
-            }
+            };
         default:
             return {
                 origin: [0, 0],
                 other: [1, 0]
-            }
+            };
     }
 };
 
-export const getTriplePieceRotatedOffsets: (selectedPiece: ITileDto, selectedPieceRotation: 0 | 90 | 180 | 270 | 360)  => GameboardTriplePieceOffsets = (selectedPiece, selectedPieceRotation) => {
+export const getTriplePieceRotatedOffsets: (
+    selectedPiece: ITileDto,
+    selectedPieceRotation: 0 | 90 | 180 | 270 | 360
+) => GameboardTriplePieceOffsets = (selectedPiece, selectedPieceRotation) => {
     const isMiddlePiece = selectedPiece.typePositionY === 1;
 
     switch (selectedPieceRotation) {
@@ -218,35 +246,37 @@ export const getTriplePieceRotatedOffsets: (selectedPiece: ITileDto, selectedPie
                 origin: [0, 0],
                 otherA: [0, 1],
                 otherB: !isMiddlePiece ? [0, 2] : [0, -1]
-            }
+            };
         case 90:
             return {
                 origin: [0, 0],
                 otherA: [-1, 0],
                 otherB: !isMiddlePiece ? [-2, 0] : [1, 0]
-            }
+            };
         case 180:
             return {
                 origin: [0, 0],
                 otherA: [0, -1],
                 otherB: !isMiddlePiece ? [0, -2] : [0, 1]
-            }
+            };
         case 270:
             return {
                 origin: [0, 0],
                 otherA: [1, 0],
                 otherB: !isMiddlePiece ? [2, 0] : [-1, 0]
-            }
+            };
         default:
             return {
                 origin: [0, 0],
                 otherA: [0, 1],
                 otherB: [0, 2]
-            }
+            };
     }
 };
 
-export const getCornerPieceRotatedOffsets: (selectedPieceRotation: 0 | 90 | 180 | 270 | 360)  => GameboardCornerPieceOffsets = (selectedPieceRotation) => {
+export const getCornerPieceRotatedOffsets: (selectedPieceRotation: 0 | 90 | 180 | 270 | 360) => GameboardCornerPieceOffsets = (
+    selectedPieceRotation
+) => {
     switch (selectedPieceRotation) {
         case 0:
         case 360:
@@ -254,31 +284,31 @@ export const getCornerPieceRotatedOffsets: (selectedPieceRotation: 0 | 90 | 180 
                 origin: [0, 0],
                 otherX: [1, 0],
                 otherY: [0, 1]
-            }
+            };
         case 90:
             return {
                 origin: [0, 0],
                 otherX: [-1, 0],
-                otherY:  [0, 1]
-            }
+                otherY: [0, 1]
+            };
         case 180:
             return {
                 origin: [0, 0],
                 otherX: [-1, 0],
-                otherY:  [0, -1]
-            }
+                otherY: [0, -1]
+            };
         case 270:
             return {
                 origin: [0, 0],
                 otherX: [1, 0],
                 otherY: [0, -1]
-            }
+            };
         default:
             return {
                 origin: [0, 0],
                 otherX: [0, 1],
                 otherY: [0, 2]
-            }
+            };
     }
 };
 

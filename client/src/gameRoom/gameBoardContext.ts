@@ -23,12 +23,12 @@ export const makeGameBoardAtoms = (state: {
         callback?.(placement);
     });
 
-    const columnDataAtom = atom<ColumnData[]>(initColumnData());
+    const playerAtom = atom(state.player);
 
     return {
         gameBoardCellMapAtom,
         placePieceCallbackAtom,
         placePieceAtom,
-        columnDataAtom
+        playerAtom
     };
 };

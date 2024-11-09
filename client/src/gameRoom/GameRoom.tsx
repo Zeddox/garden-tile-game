@@ -3,7 +3,6 @@ import { getRouteApi } from '@tanstack/react-router';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LoadingSpinner } from '../components/loading/LoadingSpinner';
-import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from '../components/ui/carousel';
 import { IGameDto, IUserDto, TileRotation } from '../generated/backend';
@@ -36,9 +35,18 @@ export const GameRoom = () => {
     );
 };
 const GameRoomInner = () => {
-    const { gameAtom, myPlayerAtom, currentPlayerAtom, selectedPieceAtom, removePieceAtom, selectedPieceRotationAtom } = useGameRoomContext();
+    const {
+        gameAtom,
+        myPlayerAtom,
+        currentPlayerAtom,
+        selectedPieceAtom,
+        removePieceAtom,
+        selectedPieceRotationAtom,
+        roundAtom
+    } = useGameRoomContext();
     const game = useAtomValue(gameAtom);
     const currentPlayer = useAtomValue(currentPlayerAtom);
+    const round = useAtomValue(roundAtom);
     const selectedUser = useSelectedUser()!;
     const selectedPiece = useAtomValue(selectedPieceAtom);
     const selectedPieceRotation = useAtomValue(selectedPieceRotationAtom);
@@ -68,18 +76,19 @@ const GameRoomInner = () => {
                 recordTurn(
                     {
                         playerId: myPlayer!.id,
-                        round: 1,
+                        round,
                         turnNumber: game!.turns!.length + 1,
                         layer: placement.layer,
                         positionX: placement.x,
                         positionY: placement.y,
-                        rotation: selectedPieceRotation === 0
-                            ? TileRotation.Zero
-                            : selectedPieceRotation === 90
-                            ? TileRotation.Ninety
-                            : selectedPieceRotation === 180
-                            ? TileRotation.OneHundredEighty
-                            : TileRotation.TwoHunderedSeventy,
+                        rotation:
+                            selectedPieceRotation === 0
+                                ? TileRotation.Zero
+                                : selectedPieceRotation === 90
+                                  ? TileRotation.Ninety
+                                  : selectedPieceRotation === 180
+                                    ? TileRotation.OneHundredEighty
+                                    : TileRotation.TwoHunderedSeventy,
                         tileId: selectedPiece!.id
                     },
                     {
@@ -90,7 +99,7 @@ const GameRoomInner = () => {
                 );
             }
         },
-        [game, myPlayer, recordTurn, removePiece, selectedPiece, selectedPieceRotation]
+        [game, myPlayer, recordTurn, removePiece, round, selectedPiece, selectedPieceRotation]
     );
 
     return (
@@ -130,28 +139,13 @@ const GameRoomInner = () => {
                             }
                         >
                             <div className={'h-[90%] content-center'}>
-                                <GameBoard game={game} player={myPlayer} onPlacePiece={onPlacePiece} />
+                                <GameBoard game={game} player={myPlayer} isMyPlayer onPlacePiece={onPlacePiece} />
                             </div>
-                            {currentPlayer?.id === myPlayer?.id ? (
-                                <Button
-                                    onClick={() =>
-                                        recordTurn({
-                                            playerId: myPlayer!.id,
-                                            round: 1,
-                                            turnNumber: game!.turns!.length + 1,
-                                            layer: 1,
-                                            positionX: 1,
-                                            positionY: 1,
-                                            rotation: TileRotation.Zero,
-                                            tileId: game.firstRoundTiles[0].id
-                                        })
-                                    }
-                                >
-                                    {'Take Turn'}
-                                </Button>
-                            ) : (
-                                `Waiting for ${currentPlayer?.name} to take their turn...`
-                            )}
+                            <div className={'text-slate-500'}>
+                                {currentPlayer?.id === myPlayer?.id
+                                    ? 'Your turn'
+                                    : `Waiting for ${currentPlayer?.name} to take their turn...`}
+                            </div>
                         </Card>
                         <span className={'text-3xl font-extralight tracking-wider text-[--primary-90]'}>{myPlayer?.name}</span>
                     </div>
@@ -173,12 +167,13 @@ const GameRoomContextProvider = (props: { game: IGameDto; selectedUser: IUserDto
 };
 
 const GameRoomContextUpdater = (props: { game: IGameDto }) => {
-    const { gameAtom, currentPlayerAtom, roundAtom, roundPiecesAtom, maxRoundAtom } = useGameRoomContext();
+    const { gameAtom, currentPlayerAtom, roundAtom, roundPiecesAtom, maxRoundAtom, playerColumnStateAtom } = useGameRoomContext();
 
     const setGame = useSetAtom(gameAtom);
     const setCurrentPlayer = useSetAtom(currentPlayerAtom);
     const setRound = useSetAtom(roundAtom);
     const setRoundPieces = useSetAtom(roundPiecesAtom);
+    const setPlayerColumnState = useSetAtom(playerColumnStateAtom);
     const maxRound = useAtomValue(maxRoundAtom);
 
     const currentPlayer = getCurrentPlayer(props.game);
@@ -192,9 +187,10 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
     }, [currentPlayer, setCurrentPlayer]);
 
     useEffect(() => {
-        const { round, roundPieces } = getRoundAndRoundPiecesFromPlayerTurns(props.game, props.game.turns, maxRound);
+        const { round, roundPieces, playerColumnState } = getRoundAndRoundPiecesFromPlayerTurns(props.game, props.game.turns, maxRound);
         setRound(round);
         setRoundPieces(roundPieces);
+        setPlayerColumnState(playerColumnState);
     }, [maxRound, props.game, setRound, setRoundPieces]);
 
     return null;

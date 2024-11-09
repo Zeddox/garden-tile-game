@@ -36,8 +36,12 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
         } else {
             set(roundPiecesAtom, next);
         }
+        set(selectedPieceAtom, undefined);
+        set(selectedPieceRotationAtom, 0);
     });
     
+    const playerColumnStateAtom = atom(new Map<string, number[]>());
+
     return {
         gameAtom,
         myPlayerAtom,
@@ -47,6 +51,7 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
         maxRoundAtom,
         roundPiecesAtom,
         removePieceAtom,
-        selectedPieceRotationAtom
+        selectedPieceRotationAtom,
+        playerColumnStateAtom
     };
 };

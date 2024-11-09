@@ -24,7 +24,7 @@ export const GamePieceSection = () => {
 
     return (
         <div className={'bg-slate h-full w-3/4 flex-auto border-l border-white'}>
-            <div className={'flex justify-between'}>
+            <div className={'flex h-6 justify-between'}>
                 <span className={'ml-5 text-xl'}>{`Round ${round}`}</span>
                 {selectedPiece && (
                     <div className={'flex gap-2'}>
