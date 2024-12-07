@@ -91,7 +91,29 @@
     }
 }
 
-
 :root {
-    --loading-dot-color: var(--primary-80)
+    --loading-dot-color: var(--primary-80);
+    --occupied-cell-background: var(--primary-60);
+}
+
+.game-board-cell {
+    --cell-color: white;
+    @container style(--cell-layer: 2) {
+        --occupied-cell-background: var(--primary-80);
+    }
+    @container style(--cell-layer: 3) {
+        --occupied-cell-background: var(--primary-100);
+    }
+    @container style(--cell-layer: 4) {
+        --cell-color: rgb(100 116 139);
+        --occupied-cell-background: var(--primary-120);
+    }
+    @container style(--cell-layer: 5) {
+        --cell-color: rgb(100 116 139);
+        --occupied-cell-background: var(--primary-140);
+    }
+    @container style(--cell-layer: 6) {
+        --cell-color: rgb(100 116 139);
+        --occupied-cell-background: var(--primary-160);
+    }
 }

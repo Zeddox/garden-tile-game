@@ -50,7 +50,7 @@ export const makeGameBoardCellAtoms = (state: {
                 const otherX = next.get(state.x + offset.other[0]);
                 const otherY = otherX?.get(state.y + offset.other[1]);
 
-                if (otherX && otherY && (otherY.layer === current.layer)) {
+                if (otherX && otherY && otherY.layer === current.layer) {
                     const other = otherY;
                     other.isHighlighted = cellState.isHighlighted;
                     other.isValidForPlacement = current.isValidForPlacement && true;

@@ -2,6 +2,7 @@ import { IGameDto, IPlayerDto, ITileDto, ITurnDto, TileDto, TileRotation, TileSh
 
 export type GameCellState = {
     isHighlighted: boolean;
+    isOrigin: boolean;
     isValidForPlacement?: boolean;
     layer?: number;
     tileType?: TileType;
@@ -35,14 +36,14 @@ export type GameboardCornerPieceOffsets = {
 export type ColumnData = {
     index: number;
     isUsed: boolean;
-}
+};
 
 export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player: IPlayerDto, tileMap: Map<string, TileDto>) => {
     const gameBoardCellsState = new Map<number, Map<number, GameCellState>>(
         new Map(
             Array.from({ length: 6 }).map((_, x) => [
                 x,
-                new Map(Array.from({ length: 6 }).map((_, y) => [y, { isHighlighted: false }]))
+                new Map(Array.from({ length: 6 }).map((_, y) => [y, { isHighlighted: false, isOrigin: false }]))
             ])
         )
     );
@@ -61,11 +62,13 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
                 const rotation = getRotationFromTileRotationEnum(turn.rotation);
 
                 if (tile.shape === TileShape.Double) {
-                    const offest = getDoublePieceRotatedOffsets(rotation);
+                    const offset = getDoublePieceRotatedOffsets(rotation);
                     const other = gameBoardCellsState
-                        .get(turn.positionX + offest.other[0])!
-                        .get(turn.positionY + offest.other[1]);
+                        .get(turn.positionX + offset.other[0])!
+                        .get(turn.positionY + offset.other[1]);
                     if (other) {
+                        other.tileType = undefined;
+                        other.typeQuantity = undefined;
                         other.layer = turn.layer;
                     }
                 }
@@ -80,7 +83,12 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
                         ?.get(turn.positionY + offset.otherB[1]);
 
                     if (otherA && otherB) {
+                        otherA.tileType = undefined;
+                        otherA.typeQuantity = undefined;
                         otherA.layer = turn.layer;
+
+                        otherB.tileType = undefined;
+                        otherB.typeQuantity = undefined;
                         otherB.layer = turn.layer;
                     }
                 }
@@ -95,9 +103,13 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
                         ?.get(turn.positionY + offset.otherY[1]);
 
                     if (otherX) {
+                        otherX.tileType = undefined;
+                        otherX.typeQuantity = undefined;
                         otherX.layer = turn.layer;
                     }
                     if (otherY) {
+                        otherY.tileType = undefined;
+                        otherY.typeQuantity = undefined;
                         otherY.layer = turn.layer;
                     }
                 }
@@ -107,10 +119,6 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
 
     return gameBoardCellsState;
 };
-
-export const getGameBoardColumnStateFromPlayerTunrs = (playerTurns: ITurnDto[], player: IPlayerDto) => {
-
-}
 
 export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurns: ITurnDto[], maxRound: number) => {
     const turns = playerTurns.sort((a, b) => a.turnNumber - b.turnNumber);

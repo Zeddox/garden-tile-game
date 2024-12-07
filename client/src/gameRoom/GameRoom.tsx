@@ -1,6 +1,6 @@
 import { GamePieceSection } from '@/gamePieces/GamePieceSection';
 import { getRouteApi } from '@tanstack/react-router';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LoadingSpinner } from '../components/loading/LoadingSpinner';
 import { Card } from '../components/ui/card';
@@ -187,11 +187,15 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
     }, [currentPlayer, setCurrentPlayer]);
 
     useEffect(() => {
-        const { round, roundPieces, playerColumnState } = getRoundAndRoundPiecesFromPlayerTurns(props.game, props.game.turns, maxRound);
+        const { round, roundPieces, playerColumnState } = getRoundAndRoundPiecesFromPlayerTurns(
+            props.game,
+            props.game.turns,
+            maxRound
+        );
         setRound(round);
         setRoundPieces(roundPieces);
         setPlayerColumnState(playerColumnState);
-    }, [maxRound, props.game, setRound, setRoundPieces]);
+    }, [maxRound, props.game, setPlayerColumnState, setRound, setRoundPieces]);
 
     return null;
 };
