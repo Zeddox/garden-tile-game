@@ -21,7 +21,8 @@ public enum TileType
     Fish,
     AzaleaBush,
     Boxwood,
-    Stone
+    Stone,
+    Pass
 }
 
 public enum TileShape
@@ -29,7 +30,8 @@ public enum TileShape
     Single,
     Double,
     Triple,
-    Corner
+    Corner,
+    Pass
 }
 
 public enum TileRotation
@@ -37,5 +39,6 @@ public enum TileRotation
     Zero,
     Ninety,
     OneHundredEighty,
-    TwoHunderedSeventy
+    TwoHunderedSeventy,
+    Pass
 }

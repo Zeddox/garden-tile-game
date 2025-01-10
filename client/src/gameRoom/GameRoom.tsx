@@ -13,6 +13,7 @@ import { GameBoard } from './GameBoard';
 import { GamePlayersSection } from './GamePlayersSection';
 import { GameRoomContext, makeGameRoomAtoms } from './gameRoomContext';
 import { useGameRoomContext } from './useGameRoomContext';
+import { Button } from '@/components/ui/button';
 
 const route = getRouteApi('/game/$gameId/room');
 
@@ -102,6 +103,19 @@ const GameRoomInner = () => {
         [game, myPlayer, recordTurn, removePiece, round, selectedPiece, selectedPieceRotation]
     );
 
+    const onPassTurn = useCallback(() => {
+        recordTurn({
+            playerId: myPlayer!.id,
+            round,
+            turnNumber: game!.turns!.length + 1,
+            layer: 0,
+            positionX: -1,
+            positionY: -1,
+            rotation: TileRotation.Pass,
+            tileId: game.passTile.id
+        });
+    }, [game, myPlayer, recordTurn, round]);
+
     return (
         <div>
             <div className={'mx-auto h-[50rem] w-full max-w-screen-2xl'}>
@@ -141,10 +155,26 @@ const GameRoomInner = () => {
                             <div className={'h-[90%] content-center'}>
                                 <GameBoard game={game} player={myPlayer} isMyPlayer onPlacePiece={onPlacePiece} />
                             </div>
-                            <div className={'text-slate-500'}>
-                                {currentPlayer?.id === myPlayer?.id
-                                    ? 'Your turn'
-                                    : `Waiting for ${currentPlayer?.name} to take their turn...`}
+                            <div className={'flex flex-col gap-2'}>
+                                <div className={'text-slate-500'}>
+                                    {currentPlayer?.id === myPlayer?.id
+                                        ? 'Your turn'
+                                        : `Waiting for ${currentPlayer?.name} to take their turn...`}
+                                </div>
+                                <div>
+                                    {currentPlayer?.id === myPlayer?.id ? (
+                                        <Button
+                                            variant={'outline'}
+                                            size={'sm'}
+                                            className={
+                                                'hover:shadow-[--primary-50]/60 hover:border-primary/70 hover:bg-[--primary-30] hover:shadow-sm'
+                                            }
+                                            onClick={() => onPassTurn()}
+                                        >
+                                            {'Pass turn'}
+                                        </Button>
+                                    ) : null}
+                                </div>
                             </div>
                         </Card>
                         <span className={'text-3xl font-extralight tracking-wider text-[--primary-90]'}>{myPlayer?.name}</span>
