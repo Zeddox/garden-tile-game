@@ -15,6 +15,8 @@ public class Game : BaseModel<Guid>
 
     public Guid StartingPlayerId { get; set; }
 
+    public Tile PassTile { get; set; }
+
     public List<Tile> FirstRoundTiles { get; set; }
 
     public List<Tile> SecondRoundTiles { get; set; }
@@ -43,6 +45,7 @@ public static class GameExtensions
             GameStatus = game.GameStatus,
             StartingPlayerId = game?.StartingPlayerId ?? Guid.Empty,
             Players = game.Players.Select(x => x.ToDto()).ToList(),
+            PassTile = game.PassTile.ToDto(),
             FirstRoundTiles = game.FirstRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
             SecondRoundTiles = game.SecondRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),
             ThirdRoundTiles = game.ThirdRoundTiles?.Select(x => x.ToDto()).ToList() ?? new List<TileDto>(),

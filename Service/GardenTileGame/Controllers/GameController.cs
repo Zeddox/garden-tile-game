@@ -57,7 +57,8 @@ public class GameController : BaseController
                     GameReady = true,
                     GamePieceColor = "#FF0000"
                 }
-            }
+            },
+            PassTile = _gameEngine.MakePassTile()
         };
 
         _db.Games.Add(game);
@@ -79,7 +80,6 @@ public class GameController : BaseController
     public async Task<ActionResult<IEnumerable<GameDto>>> GetAllJoinableGames(CancellationToken cancellationToken)
     {
         var games = await _db.Games
-            //.Where(x => x.GameStatus == GameStatus.Setup)
             .Select(x => x.ToDto())
             .ToListAsync(cancellationToken) ?? new List<GameDto>();
 

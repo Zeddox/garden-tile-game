@@ -16,6 +16,9 @@ public class GameDto : BaseDto<Guid>
     public Guid StartingPlayerId { get; set; }
 
     [Required]
+    public TileDto PassTile { get; set; }
+
+    [Required]
     public List<TileDto> FirstRoundTiles { get; set; }
 
     [Required]

@@ -544,6 +544,7 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
     gameName!: string;
     gameStatus!: GameStatus;
     startingPlayerId!: string;
+    passTile!: TileDto;
     firstRoundTiles!: TileDto[];
     secondRoundTiles!: TileDto[];
     thirdRoundTiles!: TileDto[];
@@ -556,6 +557,7 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
     constructor(data?: IGameDto) {
         super(data);
         if (!data) {
+            this.passTile = new TileDto();
             this.firstRoundTiles = [];
             this.secondRoundTiles = [];
             this.thirdRoundTiles = [];
@@ -573,6 +575,7 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
             this.gameName = _data["gameName"];
             this.gameStatus = _data["gameStatus"];
             this.startingPlayerId = _data["startingPlayerId"];
+            this.passTile = _data["passTile"] ? TileDto.fromJS(_data["passTile"]) : new TileDto();
             if (Array.isArray(_data["firstRoundTiles"])) {
                 this.firstRoundTiles = [] as any;
                 for (let item of _data["firstRoundTiles"])
@@ -628,6 +631,7 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
         data["gameName"] = this.gameName;
         data["gameStatus"] = this.gameStatus;
         data["startingPlayerId"] = this.startingPlayerId;
+        data["passTile"] = this.passTile ? this.passTile.toJSON() : <any>undefined;
         if (Array.isArray(this.firstRoundTiles)) {
             data["firstRoundTiles"] = [];
             for (let item of this.firstRoundTiles)
@@ -677,6 +681,7 @@ export interface IGameDto extends IBaseDtoOfGuid {
     gameName: string;
     gameStatus: GameStatus;
     startingPlayerId: string;
+    passTile: TileDto;
     firstRoundTiles: TileDto[];
     secondRoundTiles: TileDto[];
     thirdRoundTiles: TileDto[];
@@ -749,6 +754,7 @@ export enum TileType {
     AzaleaBush = 3,
     Boxwood = 4,
     Stone = 5,
+    Pass = 6,
 }
 
 export enum TileShape {
@@ -756,6 +762,7 @@ export enum TileShape {
     Double = 1,
     Triple = 2,
     Corner = 3,
+    Pass = 4,
 }
 
 export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
@@ -884,6 +891,7 @@ export enum TileRotation {
     Ninety = 1,
     OneHundredEighty = 2,
     TwoHunderedSeventy = 3,
+    Pass = 4,
 }
 
 export class ProblemDetails implements IProblemDetails {
@@ -1260,6 +1268,7 @@ export class Game extends BaseModelOfGuid implements IGame {
     gameName!: string;
     gameStatus!: GameStatus;
     startingPlayerId?: string;
+    passTile?: Tile | undefined;
     firstRoundTiles?: Tile[] | undefined;
     secondRoundTiles?: Tile[] | undefined;
     thirdRoundTiles?: Tile[] | undefined;
@@ -1279,6 +1288,7 @@ export class Game extends BaseModelOfGuid implements IGame {
             this.gameName = _data["gameName"];
             this.gameStatus = _data["gameStatus"];
             this.startingPlayerId = _data["startingPlayerId"];
+            this.passTile = _data["passTile"] ? Tile.fromJS(_data["passTile"]) : <any>undefined;
             if (Array.isArray(_data["firstRoundTiles"])) {
                 this.firstRoundTiles = [] as any;
                 for (let item of _data["firstRoundTiles"])
@@ -1334,6 +1344,7 @@ export class Game extends BaseModelOfGuid implements IGame {
         data["gameName"] = this.gameName;
         data["gameStatus"] = this.gameStatus;
         data["startingPlayerId"] = this.startingPlayerId;
+        data["passTile"] = this.passTile ? this.passTile.toJSON() : <any>undefined;
         if (Array.isArray(this.firstRoundTiles)) {
             data["firstRoundTiles"] = [];
             for (let item of this.firstRoundTiles)
@@ -1383,6 +1394,7 @@ export interface IGame extends IBaseModelOfGuid {
     gameName: string;
     gameStatus: GameStatus;
     startingPlayerId?: string;
+    passTile?: Tile | undefined;
     firstRoundTiles?: Tile[] | undefined;
     secondRoundTiles?: Tile[] | undefined;
     thirdRoundTiles?: Tile[] | undefined;
