@@ -29,10 +29,14 @@ export const GameBoard = (props: GameBoardProps) => {
 };
 
 const GameBoardInner = (props: GameBoardProps) => {
-    const { playerColumnStateAtom } = useGameRoomContext();
+    const { playerColumnStateAtom, playerRowStateAtom } = useGameRoomContext();
     const playerColumnState = useAtomValue(useMemo(() => {
         return selectAtom(playerColumnStateAtom, (columnStateMap) => columnStateMap.get(props.player.id))
     }, [playerColumnStateAtom, props.player.id]));
+
+    const playerRowState = useAtomValue(useMemo(() => {
+        return selectAtom(playerRowStateAtom, (rowStateMap) => rowStateMap.get(props.player.id))
+    }, [playerRowStateAtom, props.player.id]));
 
     const getRowIcon = (index: number) => {
         const styles = 'w-full h-full text-slate-500';
@@ -64,12 +68,17 @@ const GameBoardInner = (props: GameBoardProps) => {
             <div className={'flex w-fit flex-row'}>
                 <div className={'mr-4 grid grid-rows-6 border-2 border-[--primary-60]'}>
                     {Array.from({ length: 6 }).map((_, index) => (
-                        <div
-                            key={index}
-                            className={`h-24 w-24 bg-[#d2b48c24] p-2 ${index !== 0 ? 'border-t-2 border-[--primary-60]' : ''}`}
-                        >
-                            {getRowIcon(index)}
-                        </div>
+                        <div className={'relative flex h-24 max-h-full items-center justify-center'}>
+                            <div
+                                key={index}
+                                className={`h-24 w-24 bg-[#d2b48c24] p-2 ${index !== 0 ? 'border-t-2 border-[--primary-60]' : ''}`}
+                            >
+                                {getRowIcon(index)}
+                            </div>
+                            {playerRowState?.find(x => x.index === index) !== undefined && (
+                                <span className={'absolute left-0 top-0 text-gray-600'}>{playerRowState?.find(x => x.index === index)!.layers}</span>
+                            )}
+                        </div>                        
                     ))}
                 </div>
                 <div className={`grid aspect-square w-fit grid-cols-6 border-2 border-white`}>

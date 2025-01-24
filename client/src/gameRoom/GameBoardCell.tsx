@@ -35,7 +35,9 @@ const GameBoardCellInner = (props: GameBoardCellProps) => {
                   setCellState({ ...cellState, isHighlighted: false, isOrigin: false });
               },
               onMouseDown: () => {
-                  placePiece({ x: props.x, y: props.y, layer: (cellState.layer ?? 0) + 1 });
+                if (cellState.isValidForPlacement !== false) {
+                    placePiece({ x: props.x, y: props.y, layer: (cellState.layer ?? 0) + 1 });
+                }
               }
           };
 
