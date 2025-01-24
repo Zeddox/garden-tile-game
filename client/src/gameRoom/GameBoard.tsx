@@ -29,14 +29,14 @@ export const GameBoard = (props: GameBoardProps) => {
 };
 
 const GameBoardInner = (props: GameBoardProps) => {
-    const { playerColumnStateAtom, playerRowStateAtom } = useGameRoomContext();
+    const { playerColumnStateAtom } = useGameRoomContext();
+    const { playerRowStateAtom } = useGameBoardContext();
+
     const playerColumnState = useAtomValue(useMemo(() => {
         return selectAtom(playerColumnStateAtom, (columnStateMap) => columnStateMap.get(props.player.id))
     }, [playerColumnStateAtom, props.player.id]));
 
-    const playerRowState = useAtomValue(useMemo(() => {
-        return selectAtom(playerRowStateAtom, (rowStateMap) => rowStateMap.get(props.player.id))
-    }, [playerRowStateAtom, props.player.id]));
+    const playerRowState = useAtomValue(playerRowStateAtom);
 
     const getRowIcon = (index: number) => {
         const styles = 'w-full h-full text-slate-500';
@@ -75,8 +75,11 @@ const GameBoardInner = (props: GameBoardProps) => {
                             >
                                 {getRowIcon(index)}
                             </div>
-                            {playerRowState?.find(x => x.index === index) !== undefined && (
-                                <span className={'absolute left-0 top-0 text-gray-600'}>{playerRowState?.find(x => x.index === index)!.layers}</span>
+                            {playerRowState.get(index) !== undefined && (
+                                <>
+                                    <span className={'absolute left-0 top-0 text-gray-600'}>{playerRowState?.get(index)!.layers}</span>
+                                    <span className={'absolute right-0 top-0 text-gray-600'}>{playerRowState?.get(index)!.tileQuantity}</span>
+                                </>
                             )}
                         </div>                        
                     ))}

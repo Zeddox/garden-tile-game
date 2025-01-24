@@ -167,14 +167,13 @@ const GameRoomContextProvider = (props: { game: IGameDto; selectedUser: IUserDto
 };
 
 const GameRoomContextUpdater = (props: { game: IGameDto }) => {
-    const { gameAtom, currentPlayerAtom, roundAtom, roundPiecesAtom, maxRoundAtom, playerColumnStateAtom, playerRowStateAtom } = useGameRoomContext();
+    const { gameAtom, currentPlayerAtom, roundAtom, roundPiecesAtom, maxRoundAtom, playerColumnStateAtom } = useGameRoomContext();
 
     const setGame = useSetAtom(gameAtom);
     const setCurrentPlayer = useSetAtom(currentPlayerAtom);
     const setRound = useSetAtom(roundAtom);
     const setRoundPieces = useSetAtom(roundPiecesAtom);
     const setPlayerColumnState = useSetAtom(playerColumnStateAtom);
-    const setPlayerRowState = useSetAtom(playerRowStateAtom);
     const maxRound = useAtomValue(maxRoundAtom);
 
     const currentPlayer = getCurrentPlayer(props.game);
@@ -188,7 +187,7 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
     }, [currentPlayer, setCurrentPlayer]);
 
     useEffect(() => {
-        const { round, roundPieces, playerColumnState, playerRowState } = getRoundAndRoundPiecesFromPlayerTurns(
+        const { round, roundPieces, playerColumnState } = getRoundAndRoundPiecesFromPlayerTurns(
             props.game,
             props.game.turns,
             maxRound
@@ -196,8 +195,7 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
         setRound(round);
         setRoundPieces(roundPieces);
         setPlayerColumnState(playerColumnState);
-        setPlayerRowState(playerRowState);
-    }, [maxRound, props.game, setPlayerColumnState, setRound, setRoundPieces, setPlayerRowState]);
+    }, [maxRound, props.game, setPlayerColumnState, setRound, setRoundPieces]);
 
     return null;
 };

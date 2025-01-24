@@ -41,7 +41,6 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
     });
     
     const playerColumnStateAtom = atom(new Map<string, number[]>());
-    const playerRowStateAtom = atom(new Map<string, RowState[]>());
 
     return {
         gameAtom,
@@ -53,7 +52,6 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
         roundPiecesAtom,
         removePieceAtom,
         selectedPieceRotationAtom,
-        playerColumnStateAtom,
-        playerRowStateAtom
+        playerColumnStateAtom
     };
 };

@@ -39,8 +39,8 @@ export type ColumnData = {
 };
 
 export type RowState = {
-    index: number;
     layers: number;
+    tileQuantity: number;
 }
 
 export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player: IPlayerDto, tileMap: Map<string, TileDto>) => {
@@ -134,24 +134,8 @@ export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurn
         return round;
     }, 1);
 
-    const result = { round: round, roundPieces: getRoundTiles(game, round), playerColumnState: new Map<string, number[]>(), playerRowState: new Map<string, RowState[]>() };
+    const result = { round: round, roundPieces: getRoundTiles(game, round), playerColumnState: new Map<string, number[]>() };
 
-    for (const turn of turns) {
-        if (!result.playerRowState.has(turn.playerId)) {
-            result.playerRowState.set(turn.playerId, []);
-        }
-
-        const playerRowState = result.playerRowState.get(turn.playerId);
-        const rowState = playerRowState!.find(x => x.index == turn.positionY);
-
-        if (rowState !== undefined) {
-            rowState.layers = turn.layer;
-        }
-        else {
-            playerRowState!.push({ index: turn.positionY, layers: turn.layer });
-        }
-    }
-    
     for (const turn of turns.filter((x) => x.round === round)) {
         if (!result.playerColumnState.has(turn.playerId)) {
             result.playerColumnState.set(turn.playerId, []);
