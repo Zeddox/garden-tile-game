@@ -57,7 +57,8 @@ public class GameController : BaseController
                     GameReady = true,
                     GamePieceColor = "#FF0000"
                 }
-            }
+            },
+            PassTile = _gameEngine.MakePassTile()
         };
 
         _db.Games.Add(game);
@@ -79,7 +80,6 @@ public class GameController : BaseController
     public async Task<ActionResult<IEnumerable<GameDto>>> GetAllJoinableGames(CancellationToken cancellationToken)
     {
         var games = await _db.Games
-            //.Where(x => x.GameStatus == GameStatus.Setup)
             .Select(x => x.ToDto())
             .ToListAsync(cancellationToken) ?? new List<GameDto>();
 
@@ -130,6 +130,7 @@ public class GameController : BaseController
 
         var players = await _db.Players
             .Where(x => x.GameId == id)
+            .OrderBy(x => x.Order)
             .ToListAsync(cancellationToken);
 
         game.Players = players;
@@ -237,5 +238,56 @@ public class GameController : BaseController
         await _gameHubContext.Clients.Group(player.GameId.ToString()).NotifyPlayerUpdated(player.ToDto());
 
         return Ok();
+    }
+
+    /// <summary>
+    /// Record game turn.
+    /// Client is notified of recorded turn via SignalR
+    /// </summary>
+    /// <param name="dto">A Turn DTO.</param>
+    [HttpPost("{gameId}")]
+    [ApiConventionMethod(typeof(GardenTileGameApiConventions), nameof(GardenTileGameApiConventions.PostReturnsNoContent))]
+    public async Task<ActionResult> RecordGameTurn(Guid gameId, [FromBody] TurnDto dto, CancellationToken cancellationToken)
+    {
+        var game = await _db.Games.FirstOrDefaultAsync(x => x.Id == gameId, cancellationToken);
+
+        if (game == null)
+        {
+            throw new Exception($"Game {gameId} could not be found");
+        }
+
+        var player = await _db.Players
+            .FirstOrDefaultAsync(x => x.Id == dto.PlayerId, cancellationToken);
+
+        if (player == null)
+        {
+            throw new Exception($"Player with ID {dto.PlayerId} could not be found");
+        }
+
+        var turn = new Turn
+        {
+            Round = dto.Round,
+            Layer = dto.Layer,
+            TileId = dto.TileId,
+            TurnNumber = dto.TurnNumber,
+            PlayerId = dto.PlayerId,
+            Rotation = dto.Rotation,
+            PositionX = dto.PositionX,
+            PositionY = dto.PositionY
+        };
+
+        // TODO Validate turn
+        if (game.Turns == null)
+        {
+            game.Turns = new List<Turn>();
+        }
+        game.Turns.Add(turn);
+
+        _db.Games.Update(game);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        await _gameHubContext.Clients.Group(gameId.ToString()).NotifyGameTurnRecorded(gameId, dto);
+
+        return NoContent();
     }
 }

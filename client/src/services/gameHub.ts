@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import * as signalR from '@microsoft/signalr';
-import { GameDto, IGameDto, PlayerDto } from '@/generated/backend';
+import { GameDto, IGameDto, PlayerDto, TurnDto } from '@/generated/backend';
 import { gameApiQueryKeys } from './gameApi';
 import { AnyRoute, Router } from '@tanstack/react-router';
 import { TrailingSlashOption } from 'node_modules/@tanstack/react-router/dist/esm/router';
@@ -40,8 +40,8 @@ export const connectToGameHub = (
         router.navigate({ to: `/game/$gameId/room`, params: { gameId: game.id } });
         queryClient.setQueryData<GameDto[]>(gameApiQueryKeys.games, (prev) => {
             const next = [...(prev ?? [])];
-            const gameIndex = next.findIndex(x => x.id === game.id);
-            if(gameIndex>-1) {
+            const gameIndex = next.findIndex((x) => x.id === game.id);
+            if (gameIndex > -1) {
                 next[gameIndex] = game;
             }
             return next;
@@ -52,7 +52,6 @@ export const connectToGameHub = (
         console.log('playerUpdated', { player });
         queryClient.setQueryData<IGameDto>(gameApiQueryKeys.game(player.gameId!), (prev) => {
             const next = prev ? { ...prev } : new GameDto();
-            console.log({ next, prev });
             next.players = [...(next.players ?? [])];
             next.players.splice(
                 next.players.findIndex((x) => x.id === player.id),
@@ -60,6 +59,15 @@ export const connectToGameHub = (
                 player
             );
 
+            return next;
+        });
+    });
+
+    connection.on('NotifyGameTurnRecorded', (gameId: string, turn: TurnDto) => {
+        console.log('turn recorded', { gameId, turn });
+        queryClient.setQueryData<IGameDto>(gameApiQueryKeys.game(gameId), (prev) => {
+            const next = prev ? { ...prev } : new GameDto();
+            next.turns = [...next.turns, turn];
             return next;
         });
     });

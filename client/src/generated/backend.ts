@@ -449,6 +449,59 @@ export class ApiClient extends ApiClientBase {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    game_RecordGameTurn(gameId: string, dto: TurnDto): Promise<void> {
+        let url_ = this.baseUrl + "/api/games/{gameId}";
+        if (gameId === undefined || gameId === null)
+            throw new Error("The parameter 'gameId' must be defined.");
+        url_ = url_.replace("{gameId}", encodeURIComponent("" + gameId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.http.fetch(url_, transformedOptions_);
+        }).then((_response: Response) => {
+            return this.processGame_RecordGameTurn(_response);
+        });
+    }
+
+    protected processGame_RecordGameTurn(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 204) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status === 400) {
+            return response.text().then((_responseText) => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ValidationProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ProblemDetails.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<void>(null as any);
+    }
 }
 
 export class BaseDtoOfGuid implements IBaseDtoOfGuid {
@@ -490,18 +543,30 @@ export interface IBaseDtoOfGuid {
 export class GameDto extends BaseDtoOfGuid implements IGameDto {
     gameName!: string;
     gameStatus!: GameStatus;
-    startingPlayerId?: string;
-    firstRoundTiles?: TileDto[] | undefined;
-    secondRoundTiles?: TileDto[] | undefined;
-    thirdRoundTiles?: TileDto[] | undefined;
-    fourthRoundTiles?: TileDto[] | undefined;
-    fifthRoundTiles?: TileDto[] | undefined;
-    sixthRoundTiles?: TileDto[] | undefined;
-    players?: PlayerDto[] | undefined;
-    turns?: TurnDto[] | undefined;
+    startingPlayerId!: string;
+    passTile!: TileDto;
+    firstRoundTiles!: TileDto[];
+    secondRoundTiles!: TileDto[];
+    thirdRoundTiles!: TileDto[];
+    fourthRoundTiles!: TileDto[];
+    fifthRoundTiles!: TileDto[];
+    sixthRoundTiles!: TileDto[];
+    players!: PlayerDto[];
+    turns!: TurnDto[];
 
     constructor(data?: IGameDto) {
         super(data);
+        if (!data) {
+            this.passTile = new TileDto();
+            this.firstRoundTiles = [];
+            this.secondRoundTiles = [];
+            this.thirdRoundTiles = [];
+            this.fourthRoundTiles = [];
+            this.fifthRoundTiles = [];
+            this.sixthRoundTiles = [];
+            this.players = [];
+            this.turns = [];
+        }
     }
 
     override init(_data?: any) {
@@ -510,6 +575,7 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
             this.gameName = _data["gameName"];
             this.gameStatus = _data["gameStatus"];
             this.startingPlayerId = _data["startingPlayerId"];
+            this.passTile = _data["passTile"] ? TileDto.fromJS(_data["passTile"]) : new TileDto();
             if (Array.isArray(_data["firstRoundTiles"])) {
                 this.firstRoundTiles = [] as any;
                 for (let item of _data["firstRoundTiles"])
@@ -565,6 +631,7 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
         data["gameName"] = this.gameName;
         data["gameStatus"] = this.gameStatus;
         data["startingPlayerId"] = this.startingPlayerId;
+        data["passTile"] = this.passTile ? this.passTile.toJSON() : <any>undefined;
         if (Array.isArray(this.firstRoundTiles)) {
             data["firstRoundTiles"] = [];
             for (let item of this.firstRoundTiles)
@@ -613,15 +680,16 @@ export class GameDto extends BaseDtoOfGuid implements IGameDto {
 export interface IGameDto extends IBaseDtoOfGuid {
     gameName: string;
     gameStatus: GameStatus;
-    startingPlayerId?: string;
-    firstRoundTiles?: TileDto[] | undefined;
-    secondRoundTiles?: TileDto[] | undefined;
-    thirdRoundTiles?: TileDto[] | undefined;
-    fourthRoundTiles?: TileDto[] | undefined;
-    fifthRoundTiles?: TileDto[] | undefined;
-    sixthRoundTiles?: TileDto[] | undefined;
-    players?: PlayerDto[] | undefined;
-    turns?: TurnDto[] | undefined;
+    startingPlayerId: string;
+    passTile: TileDto;
+    firstRoundTiles: TileDto[];
+    secondRoundTiles: TileDto[];
+    thirdRoundTiles: TileDto[];
+    fourthRoundTiles: TileDto[];
+    fifthRoundTiles: TileDto[];
+    sixthRoundTiles: TileDto[];
+    players: PlayerDto[];
+    turns: TurnDto[];
 }
 
 export enum GameStatus {
@@ -631,11 +699,11 @@ export enum GameStatus {
 }
 
 export class TileDto extends BaseDtoOfGuid implements ITileDto {
-    type?: TileType;
-    shape?: TileShape;
-    typePositionX?: number;
-    typePositionY?: number;
-    typeQuantity?: number;
+    type!: TileType;
+    shape!: TileShape;
+    typePositionX!: number;
+    typePositionY!: number;
+    typeQuantity!: number;
 
     constructor(data?: ITileDto) {
         super(data);
@@ -672,11 +740,11 @@ export class TileDto extends BaseDtoOfGuid implements ITileDto {
 }
 
 export interface ITileDto extends IBaseDtoOfGuid {
-    type?: TileType;
-    shape?: TileShape;
-    typePositionX?: number;
-    typePositionY?: number;
-    typeQuantity?: number;
+    type: TileType;
+    shape: TileShape;
+    typePositionX: number;
+    typePositionY: number;
+    typeQuantity: number;
 }
 
 export enum TileType {
@@ -686,6 +754,7 @@ export enum TileType {
     AzaleaBush = 3,
     Boxwood = 4,
     Stone = 5,
+    Pass = 6,
 }
 
 export enum TileShape {
@@ -693,6 +762,7 @@ export enum TileShape {
     Double = 1,
     Triple = 2,
     Corner = 3,
+    Pass = 4,
 }
 
 export class PlayerDto extends BaseDtoOfGuid implements IPlayerDto {
@@ -753,14 +823,14 @@ export interface IPlayerDto extends IBaseDtoOfGuid {
 }
 
 export class TurnDto implements ITurnDto {
-    round?: number;
-    turnNumber?: number;
-    playerId?: string;
-    tileId?: string;
-    positionX?: number;
-    positionY?: number;
-    rotation?: TileRotation;
-    layer?: number;
+    round!: number;
+    turnNumber!: number;
+    playerId!: string;
+    tileId!: string;
+    positionX!: number;
+    positionY!: number;
+    rotation!: TileRotation;
+    layer!: number;
 
     constructor(data?: ITurnDto) {
         if (data) {
@@ -806,14 +876,14 @@ export class TurnDto implements ITurnDto {
 }
 
 export interface ITurnDto {
-    round?: number;
-    turnNumber?: number;
-    playerId?: string;
-    tileId?: string;
-    positionX?: number;
-    positionY?: number;
-    rotation?: TileRotation;
-    layer?: number;
+    round: number;
+    turnNumber: number;
+    playerId: string;
+    tileId: string;
+    positionX: number;
+    positionY: number;
+    rotation: TileRotation;
+    layer: number;
 }
 
 export enum TileRotation {
@@ -821,6 +891,7 @@ export enum TileRotation {
     Ninety = 1,
     OneHundredEighty = 2,
     TwoHunderedSeventy = 3,
+    Pass = 4,
 }
 
 export class ProblemDetails implements IProblemDetails {
@@ -1197,6 +1268,7 @@ export class Game extends BaseModelOfGuid implements IGame {
     gameName!: string;
     gameStatus!: GameStatus;
     startingPlayerId?: string;
+    passTile?: Tile | undefined;
     firstRoundTiles?: Tile[] | undefined;
     secondRoundTiles?: Tile[] | undefined;
     thirdRoundTiles?: Tile[] | undefined;
@@ -1216,6 +1288,7 @@ export class Game extends BaseModelOfGuid implements IGame {
             this.gameName = _data["gameName"];
             this.gameStatus = _data["gameStatus"];
             this.startingPlayerId = _data["startingPlayerId"];
+            this.passTile = _data["passTile"] ? Tile.fromJS(_data["passTile"]) : <any>undefined;
             if (Array.isArray(_data["firstRoundTiles"])) {
                 this.firstRoundTiles = [] as any;
                 for (let item of _data["firstRoundTiles"])
@@ -1271,6 +1344,7 @@ export class Game extends BaseModelOfGuid implements IGame {
         data["gameName"] = this.gameName;
         data["gameStatus"] = this.gameStatus;
         data["startingPlayerId"] = this.startingPlayerId;
+        data["passTile"] = this.passTile ? this.passTile.toJSON() : <any>undefined;
         if (Array.isArray(this.firstRoundTiles)) {
             data["firstRoundTiles"] = [];
             for (let item of this.firstRoundTiles)
@@ -1320,6 +1394,7 @@ export interface IGame extends IBaseModelOfGuid {
     gameName: string;
     gameStatus: GameStatus;
     startingPlayerId?: string;
+    passTile?: Tile | undefined;
     firstRoundTiles?: Tile[] | undefined;
     secondRoundTiles?: Tile[] | undefined;
     thirdRoundTiles?: Tile[] | undefined;

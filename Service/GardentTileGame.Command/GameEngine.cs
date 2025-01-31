@@ -1,4 +1,5 @@
-﻿using GardenTileGame.Data.Constants;
+﻿using GardenTileGame.Data;
+using GardenTileGame.Data.Constants;
 
 namespace GardentTileGame.Command;
 
@@ -28,6 +29,19 @@ public class GameEngine
         game.FourthRoundTiles = roundTiles.GetValueOrDefault(4);
         game.FifthRoundTiles = roundTiles.GetValueOrDefault(5);
         game.SixthRoundTiles = roundTiles.GetValueOrDefault(6);
+    }
+
+    public Tile MakePassTile()
+    {
+        return new Tile
+        {
+            Id = Guid.Empty,
+            Shape = TileShape.Pass,
+            Type = TileType.Pass,
+            TypePositionX = -1,
+            TypePositionY = -1,
+            TypeQuantity = 0,
+        };
     }
 
     public Dictionary<int, List<Tile>> MakeTilesForRounds(int numberOfRounds)

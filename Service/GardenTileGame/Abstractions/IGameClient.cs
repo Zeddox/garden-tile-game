@@ -13,4 +13,6 @@ public interface IGameClient
     Task NotifyPlayerUpdated(PlayerDto player);
 
     Task NotifyPlayersConnectionIdUpdated(IEnumerable<UpdatePlayerConnectionIdDto> players);
+
+    Task NotifyGameTurnRecorded(Guid gameId, TurnDto turn);
 }

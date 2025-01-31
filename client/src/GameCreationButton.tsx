@@ -12,7 +12,7 @@ export const GameCreationButton = () => {
         <Button
             variant={'outline'}
             size={'sm'}
-            className={'hover:bg-[--primary-30] hover:border-primary/70 hover:shadow-sm hover:shadow-[--primary-50]/60'}
+            className={'hover:shadow-[--primary-50]/60 hover:border-primary/70 hover:bg-[--primary-30] hover:shadow-sm'}
             onClick={() => setShowDialog(true)}
             disabled={showDialog || selectedUser === undefined}
         >
