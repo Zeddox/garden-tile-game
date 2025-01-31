@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import React from 'react';
-import { IGameDto, IPlayerDto, ITileDto, IUserDto } from '../generated/backend';
-import { ColumnData, getRoundTiles, initColumnData, RowState } from './game';
+import { IGameDto, IPlayerDto, ITileDto, IUserDto, TileType } from '../generated/backend';
+import { getRoundTiles } from './game';
 
 export type GameRoomContextValue = ReturnType<typeof makeGameRoomAtoms>;
 
@@ -39,8 +39,10 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
         set(selectedPieceAtom, undefined);
         set(selectedPieceRotationAtom, 0);
     });
-    
+
     const playerColumnStateAtom = atom(new Map<string, number[]>());
+
+    const fifthLayerBonusesAtom = atom<{ tileType: TileType; playerId?: string }[]>([]);
 
     return {
         gameAtom,
@@ -52,6 +54,7 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
         roundPiecesAtom,
         removePieceAtom,
         selectedPieceRotationAtom,
-        playerColumnStateAtom
+        playerColumnStateAtom,
+        fifthLayerBonusesAtom
     };
 };

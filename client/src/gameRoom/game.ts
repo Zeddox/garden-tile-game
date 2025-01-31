@@ -41,7 +41,7 @@ export type ColumnData = {
 export type RowState = {
     layers: number;
     tileQuantity: number;
-}
+};
 
 export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player: IPlayerDto, tileMap: Map<string, TileDto>) => {
     const gameBoardCellsState = new Map<number, Map<number, GameCellState>>(
@@ -125,16 +125,48 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
     return gameBoardCellsState;
 };
 
+type GameRoomState = {
+    round: number;
+    roundPieces: TileDto[];
+    playerColumnState: Map<string, number[]>;
+    fifthLayerBonuses: { tileType: TileType; playerId?: string }[];
+};
+
 export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurns: ITurnDto[], maxRound: number) => {
     const turns = playerTurns.sort((a, b) => a.turnNumber - b.turnNumber);
+
+    const result: GameRoomState = {
+        round: 1,
+        roundPieces: getRoundTiles(game, 1),
+        playerColumnState: new Map<string, number[]>(),
+        fifthLayerBonuses: [
+            { tileType: TileType.MapleTree },
+            { tileType: TileType.Pagoda },
+            { tileType: TileType.Fish },
+            { tileType: TileType.AzaleaBush },
+            { tileType: TileType.Boxwood },
+            { tileType: TileType.Stone }
+        ]
+    };
+
     const round = turns.reduce((round, turn) => {
+        if (turn.layer === 5) {
+            const tileType = getRoundTiles(game, turn.round).find((x) => x.id === turn.tileId)?.type;
+            if (tileType) {
+                const fifthLayerBonus = result.fifthLayerBonuses.find((x) => x.tileType === tileType);
+                if (fifthLayerBonus !== undefined && fifthLayerBonus.playerId === undefined) {
+                    fifthLayerBonus.playerId = turn.playerId;
+                }
+            }
+        }
         if (turn.round > round) {
             return round + 1;
         }
         return round;
     }, 1);
 
-    const result = { round: round, roundPieces: getRoundTiles(game, round), playerColumnState: new Map<string, number[]>() };
+    result.round = round;
+    result.roundPieces = getRoundTiles(game, round);
 
     for (const turn of turns.filter((x) => x.round === round)) {
         if (!result.playerColumnState.has(turn.playerId)) {
@@ -149,6 +181,7 @@ export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurn
             result.roundPieces.splice(pieceIndex, 1);
         }
     }
+    console.log({ round, columnState: result.playerColumnState });
 
     if (result.roundPieces.length === 0) {
         if (result.round < maxRound) {
