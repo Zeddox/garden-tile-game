@@ -23,6 +23,12 @@ export const GamePlayersSection = () => {
         return scores;
     }, new Map<string, number>());
 
+    fifthLayerBonuses.forEach((x) => {
+        if (x.playerId !== undefined) {
+            scores.set(x.playerId, (scores.get(x.playerId) ?? 0) + getFifthLayerBonusAmount(x.tileType));
+        }
+    });
+
     return (
         <div className={'bg-slate w-1/4 flex-auto border-slate-700/40'}>
             <span className={'text-xl'}>{'Players'}</span>
@@ -37,6 +43,8 @@ export const GamePlayersSection = () => {
                             <span className={'h-4 w-4 rounded-sm'} style={{ background: player.gamePieceColor }}></span>
                             <span>{player.name}</span>
                             {player.gameLeader ? <FaCrown /> : null}
+                        </div>
+                        <div className={'flex items-center gap-2'}>
                             {fifthLayerBonuses
                                 .filter((x) => x.playerId === player.id)
                                 .map((x) => (
@@ -44,8 +52,8 @@ export const GamePlayersSection = () => {
                                         {getTileTypeIcon(x.tileType)}
                                     </span>
                                 ))}
+                            <div className={'font-semibold'}>{scores.get(player.id) ?? 0}</div>
                         </div>
-                        <div className={'font-semibold'}>{scores.get(player.id) ?? 0}</div>
                     </div>
                 ))}
             </div>
@@ -67,5 +75,24 @@ const getTileTypeIcon = (tileType: TileType) => {
             return <GiMushroomHouse />;
         default:
             return <GiStonePile />;
+    }
+};
+
+const getFifthLayerBonusAmount = (tileType: TileType) => {
+    switch (tileType) {
+        case TileType.MapleTree:
+            return 10;
+        case TileType.Pagoda:
+            return 9;
+        case TileType.Fish:
+            return 8;
+        case TileType.AzaleaBush:
+            return 7;
+        case TileType.Boxwood:
+            return 6;
+        case TileType.Stone:
+            return 5;
+        default:
+            return 0;
     }
 };
