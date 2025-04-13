@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { GamePieceSection } from '@/gamePieces/GamePieceSection';
 import { getRouteApi } from '@tanstack/react-router';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -13,7 +14,7 @@ import { GameBoard } from './GameBoard';
 import { GamePlayersSection } from './GamePlayersSection';
 import { GameRoomContext, makeGameRoomAtoms } from './gameRoomContext';
 import { useGameRoomContext } from './useGameRoomContext';
-import { Button } from '@/components/ui/button';
+import { GameSummarySection } from './GameSummarySection';
 
 const route = getRouteApi('/game/$gameId/room');
 
@@ -48,6 +49,7 @@ const GameRoomInner = () => {
     const game = useAtomValue(gameAtom);
     const currentPlayer = useAtomValue(currentPlayerAtom);
     const round = useAtomValue(roundAtom);
+    const playState = 'gameOver'; // useAtomValue(playStateAtom);
     const selectedUser = useSelectedUser()!;
     const selectedPiece = useAtomValue(selectedPieceAtom);
     const selectedPieceRotation = useAtomValue(selectedPieceRotationAtom);
@@ -120,8 +122,14 @@ const GameRoomInner = () => {
         <div>
             <div className={'mx-auto h-[50rem] w-full max-w-screen-2xl'}>
                 <div className={'mb-5 mt-5 flex h-[15rem]'}>
-                    <GamePlayersSection />
-                    <GamePieceSection />
+                    {playState === 'gameOver' ? (
+                        <GameSummarySection />
+                    ) : (
+                        <>
+                            <GamePlayersSection />
+                            <GamePieceSection />
+                        </>
+                    )}
                 </div>
                 <div className={'flex h-[55rem] gap-16'}>
                     <Carousel className={'flex-none'} setApi={setApi}>
@@ -204,7 +212,8 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
         roundPiecesAtom,
         maxRoundAtom,
         playerColumnStateAtom,
-        fifthLayerBonusesAtom
+        fifthLayerBonusesAtom,
+        playStateAtom
     } = useGameRoomContext();
 
     const setGame = useSetAtom(gameAtom);
@@ -213,6 +222,7 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
     const setRoundPieces = useSetAtom(roundPiecesAtom);
     const setPlayerColumnState = useSetAtom(playerColumnStateAtom);
     const setFifthLayerBonuses = useSetAtom(fifthLayerBonusesAtom);
+    const setPlayState = useSetAtom(playStateAtom);
     const maxRound = useAtomValue(maxRoundAtom);
 
     const currentPlayer = getCurrentPlayer(props.game);
@@ -226,7 +236,7 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
     }, [currentPlayer, setCurrentPlayer]);
 
     useEffect(() => {
-        const { round, roundPieces, playerColumnState, fifthLayerBonuses } = getRoundAndRoundPiecesFromPlayerTurns(
+        const { round, roundPieces, playerColumnState, fifthLayerBonuses, playState } = getRoundAndRoundPiecesFromPlayerTurns(
             props.game,
             props.game.turns,
             maxRound
@@ -235,7 +245,8 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
         setRoundPieces(roundPieces);
         setPlayerColumnState(playerColumnState);
         setFifthLayerBonuses(fifthLayerBonuses);
-    }, [maxRound, props.game, setFifthLayerBonuses, setPlayerColumnState, setRound, setRoundPieces]);
+        setPlayState(playState);
+    }, [maxRound, props.game, setFifthLayerBonuses, setPlayState, setPlayerColumnState, setRound, setRoundPieces]);
 
     return null;
 };

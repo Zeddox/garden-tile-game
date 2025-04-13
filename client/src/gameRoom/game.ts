@@ -130,12 +130,14 @@ type GameRoomState = {
     roundPieces: TileDto[];
     playerColumnState: Map<string, number[]>;
     fifthLayerBonuses: { tileType: TileType; playerId?: string }[];
+    playState: 'inProgress' | 'gameOver';
 };
 
 export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurns: ITurnDto[], maxRound: number) => {
     const turns = playerTurns.sort((a, b) => a.turnNumber - b.turnNumber);
 
     const result: GameRoomState = {
+        playState: 'inProgress',
         round: 1,
         roundPieces: getRoundTiles(game, 1),
         playerColumnState: new Map<string, number[]>(),
@@ -190,6 +192,7 @@ export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurn
             result.playerColumnState.clear();
         } else {
             console.log('GAME OVER');
+            result.playState = 'gameOver';
         }
     }
 
@@ -379,4 +382,23 @@ export const initColumnData: () => ColumnData[] = () => {
         index: i,
         isUsed: false
     }));
+};
+
+export const getFifthLayerBonusAmount = (tileType: TileType) => {
+    switch (tileType) {
+        case TileType.MapleTree:
+            return 10;
+        case TileType.Pagoda:
+            return 9;
+        case TileType.Fish:
+            return 8;
+        case TileType.AzaleaBush:
+            return 7;
+        case TileType.Boxwood:
+            return 6;
+        case TileType.Stone:
+            return 5;
+        default:
+            return 0;
+    }
 };

@@ -1,6 +1,6 @@
 import { useAtomValue } from 'jotai';
 import { FaCrown } from 'react-icons/fa';
-import { getRoundTiles } from './game';
+import { getFifthLayerBonusAmount, getRoundTiles } from './game';
 import { useGameRoomContext } from './useGameRoomContext';
 import { TileType } from '@/generated/backend';
 import { GiFlowers, GiLindenLeaf, GiCirclingFish, GiFruitTree, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
@@ -75,24 +75,5 @@ const getTileTypeIcon = (tileType: TileType) => {
             return <GiMushroomHouse />;
         default:
             return <GiStonePile />;
-    }
-};
-
-const getFifthLayerBonusAmount = (tileType: TileType) => {
-    switch (tileType) {
-        case TileType.MapleTree:
-            return 10;
-        case TileType.Pagoda:
-            return 9;
-        case TileType.Fish:
-            return 8;
-        case TileType.AzaleaBush:
-            return 7;
-        case TileType.Boxwood:
-            return 6;
-        case TileType.Stone:
-            return 5;
-        default:
-            return 0;
     }
 };

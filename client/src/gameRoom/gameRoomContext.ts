@@ -43,6 +43,7 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
     const playerColumnStateAtom = atom(new Map<string, number[]>());
 
     const fifthLayerBonusesAtom = atom<{ tileType: TileType; playerId?: string }[]>([]);
+    const playStateAtom = atom<'inProgress' | 'gameOver'>('inProgress');
 
     return {
         gameAtom,
@@ -55,6 +56,7 @@ export const makeGameRoomAtoms = (state: { game: IGameDto; selectedUser: IUserDt
         removePieceAtom,
         selectedPieceRotationAtom,
         playerColumnStateAtom,
-        fifthLayerBonusesAtom
+        fifthLayerBonusesAtom,
+        playStateAtom
     };
 };
