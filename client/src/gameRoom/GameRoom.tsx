@@ -44,12 +44,14 @@ const GameRoomInner = () => {
         selectedPieceAtom,
         removePieceAtom,
         selectedPieceRotationAtom,
-        roundAtom
+        roundAtom,
+        playStateAtom
     } = useGameRoomContext();
     const game = useAtomValue(gameAtom);
     const currentPlayer = useAtomValue(currentPlayerAtom);
     const round = useAtomValue(roundAtom);
-    const playState = 'gameOver'; // useAtomValue(playStateAtom);
+    const playState = useAtomValue(playStateAtom);
+
     const selectedUser = useSelectedUser()!;
     const selectedPiece = useAtomValue(selectedPieceAtom);
     const selectedPieceRotation = useAtomValue(selectedPieceRotationAtom);
@@ -163,27 +165,29 @@ const GameRoomInner = () => {
                             <div className={'h-[90%] content-center'}>
                                 <GameBoard game={game} player={myPlayer} isMyPlayer onPlacePiece={onPlacePiece} />
                             </div>
-                            <div className={'flex flex-col gap-2'}>
-                                <div className={'text-slate-500'}>
-                                    {currentPlayer?.id === myPlayer?.id
-                                        ? 'Your turn'
-                                        : `Waiting for ${currentPlayer?.name} to take their turn...`}
+                            {playState !== 'gameOver' && (
+                                <div className={'flex flex-col gap-2'}>
+                                    <div className={'text-slate-500'}>
+                                        {currentPlayer?.id === myPlayer?.id
+                                            ? 'Your turn'
+                                            : `Waiting for ${currentPlayer?.name} to take their turn...`}
+                                    </div>
+                                    <div>
+                                        {currentPlayer?.id === myPlayer?.id ? (
+                                            <Button
+                                                variant={'outline'}
+                                                size={'sm'}
+                                                className={
+                                                    'hover:shadow-[--primary-50]/60 hover:border-primary/70 hover:bg-[--primary-30] hover:shadow-sm'
+                                                }
+                                                onClick={() => onPassTurn()}
+                                            >
+                                                {'Pass turn'}
+                                            </Button>
+                                        ) : null}
+                                    </div>
                                 </div>
-                                <div>
-                                    {currentPlayer?.id === myPlayer?.id ? (
-                                        <Button
-                                            variant={'outline'}
-                                            size={'sm'}
-                                            className={
-                                                'hover:shadow-[--primary-50]/60 hover:border-primary/70 hover:bg-[--primary-30] hover:shadow-sm'
-                                            }
-                                            onClick={() => onPassTurn()}
-                                        >
-                                            {'Pass turn'}
-                                        </Button>
-                                    ) : null}
-                                </div>
-                            </div>
+                            )}
                         </Card>
                         <span className={'text-3xl font-extralight tracking-wider text-[--primary-90]'}>{myPlayer?.name}</span>
                     </div>

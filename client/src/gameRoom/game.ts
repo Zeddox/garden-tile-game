@@ -170,11 +170,12 @@ export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurn
     result.round = round;
     result.roundPieces = getRoundTiles(game, round);
 
-    for (const turn of turns.filter((x) => x.round === round)) {
+    const roundTurns = turns.filter((x) => x.round === round);
+
+    for (const turn of roundTurns) {
         if (!result.playerColumnState.has(turn.playerId)) {
             result.playerColumnState.set(turn.playerId, []);
         }
-
         const playerColumnState = result.playerColumnState.get(turn.playerId);
         playerColumnState!.push(turn.positionX);
 
@@ -183,9 +184,20 @@ export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurn
             result.roundPieces.splice(pieceIndex, 1);
         }
     }
-    console.log({ round, columnState: result.playerColumnState });
-
-    if (result.roundPieces.length === 0) {
+    
+    const playerPasses = new Set<string>();
+    const reversedTurns = roundTurns.reverse();
+    
+    for (const turn of reversedTurns) {
+        if (turn.rotation === TileRotation.Pass || result.playerColumnState.get(turn.playerId)?.length === 6) {
+            playerPasses.add(turn.playerId);
+         }
+         else {
+            break;
+         }
+    }
+    
+    if (result.roundPieces.length === 0 || playerPasses.size === game.players.length) {
         if (result.round < maxRound) {
             result.round += 1;
             result.roundPieces = getRoundTiles(game, result.round);
@@ -402,3 +414,41 @@ export const getFifthLayerBonusAmount = (tileType: TileType) => {
             return 0;
     }
 };
+
+export const getMostQuantityBonuses = (tileType: TileType) => {
+    switch (tileType) {
+        case TileType.MapleTree:
+            return 15;
+        case TileType.Pagoda:
+            return 12;
+        case TileType.Fish:
+            return 9;
+        case TileType.AzaleaBush:
+            return 8;
+        case TileType.Boxwood:
+            return 7;
+        case TileType.Stone:
+            return 6;
+        default:
+            return 0;
+    }
+ };
+
+ export const getSecondMostQuantityBonuses = (tileType: TileType) => {
+    switch (tileType) {
+        case TileType.MapleTree:
+            return 7;
+        case TileType.Pagoda:
+            return 6;
+        case TileType.Fish:
+            return 4;
+        case TileType.AzaleaBush:
+            return 4;
+        case TileType.Boxwood:
+            return 3;
+        case TileType.Stone:
+            return 3;
+        default:
+            return 0;
+    }
+ };

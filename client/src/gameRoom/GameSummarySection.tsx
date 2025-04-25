@@ -1,8 +1,9 @@
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
-import { getFifthLayerBonusAmount, getGameBoardCellsFromPlayerTurns, getRoundTiles, getTileMap } from './game';
+import { getFifthLayerBonusAmount, getGameBoardCellsFromPlayerTurns, getMostQuantityBonuses, getRoundTiles, getSecondMostQuantityBonuses, getTileMap } from './game';
 import { useGameRoomContext } from './useGameRoomContext';
 import { GiFlowers, GiLindenLeaf, GiCirclingFish, GiFruitTree, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
+import { TileType } from '@/generated/backend';
 
 export const GameSummarySection = () => {
     const { gameAtom, fifthLayerBonusesAtom } = useGameRoomContext();
@@ -59,18 +60,31 @@ export const GameSummarySection = () => {
 
         sortedTypeQuantitiesMap.forEach((playerQuantities, index) => {
             playerQuantities.sort((a, b) => b.quantity - a.quantity);
+            
+            const mostPlayerIds = playerQuantities.filter((x) => x.quantity === playerQuantities[0].quantity).map((x) => x.playerId);
+
+            mostPlayerIds.forEach((playerId) => { 
+                scores.set(playerId, (scores.get(playerId) ?? 0) + getMostQuantityBonuses(index));
+            });
+
             mostQuantityBonuses.set(index, {
                 quantity: playerQuantities[0].quantity,
-                playerIds: playerQuantities.filter((x) => x.quantity === playerQuantities[0].quantity).map((x) => x.playerId)
+                playerIds: mostPlayerIds
             });
             const awardSecondMostBonuses = !(mostQuantityBonuses.get(index)!.playerIds.length > 1);
             if (awardSecondMostBonuses) {
                 const secondMostQuantity = playerQuantities.filter(
                     (x) => x.quantity < mostQuantityBonuses.get(index)!.quantity
                 )[0].quantity;
+
+                const secondMostPlayerIds = playerQuantities.filter((x) => x.quantity === secondMostQuantity).map((x) => x.playerId);
+                secondMostPlayerIds.forEach((playerId) => {
+                    scores.set(playerId, (scores.get(playerId) ?? 0) + getSecondMostQuantityBonuses(index));
+                });
+
                 secondMostQuantityBonuses.set(index, {
                     quantity: secondMostQuantity,
-                    playerIds: playerQuantities.filter((x) => x.quantity === secondMostQuantity).map((x) => x.playerId)
+                    playerIds: secondMostPlayerIds
                 });
             }
         });
@@ -81,14 +95,13 @@ export const GameSummarySection = () => {
         <div className={'bg-slate w-1/4 flex-auto border-slate-700/40'}>
             <span className={'text-xl'}>{'Players'}</span>
             <div className={'mt-4 grid auto-rows-auto'}>
-                <div className={'grid grid-cols-5 gap-2 font-semibold text-slate-400'}>
+                <div className={'grid grid-cols-4 gap-2 font-semibold text-slate-400'}>
                     <div>{'Player'}</div>
                     <div>{'Final Score'}</div>
                     <div>{'Fifth Layer Bonuses'}</div>
                     <div>{'Most Type Bonuses'}</div>
-                    <div>{'Rounds Points'}</div>
                 </div>
-                <div className={'grid grid-cols-5 gap-2 font-semibold text-slate-400'}>
+                <div className={'grid grid-cols-4 gap-2 font-semibold text-slate-400'}>
                     <div></div>
                     <div></div>
                     <div className={'grid h-4 grid-cols-6 items-center gap-2'}>
@@ -107,10 +120,9 @@ export const GameSummarySection = () => {
                         <GiLindenLeaf />
                         <GiStonePile />
                     </div>
-                    <div></div>
                 </div>
                 {players.map((player) => (
-                    <div key={player.id} className={'grid grid-cols-5 gap-2 data-[is-current-player="true"]:bg-[--primary-50]'}>
+                    <div key={player.id} className={'grid grid-cols-4 gap-2 data-[is-current-player="true"]:bg-[--primary-50]'}>
                         <div className={'flex items-center gap-3'}>
                             <span className={'h-4 w-4 rounded-sm'} style={{ background: player.gamePieceColor }}></span>
                             <span>{player.name}</span>
@@ -150,9 +162,6 @@ export const GameSummarySection = () => {
                                 }
                                 return <span key={`${player.id}_${index}`}></span>;
                             })}
-                        </div>
-                        <div className={'flex items-center gap-2'}>
-                            {/* <div className={'font-semibold'}>{scores.get(player.id) ?? 0}</div> */}
                         </div>
                     </div>
                 ))}
