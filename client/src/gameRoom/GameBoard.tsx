@@ -32,9 +32,11 @@ const GameBoardInner = (props: GameBoardProps) => {
     const { playerColumnStateAtom } = useGameRoomContext();
     const { playerRowStateAtom } = useGameBoardContext();
 
-    const playerColumnState = useAtomValue(useMemo(() => {
-        return selectAtom(playerColumnStateAtom, (columnStateMap) => columnStateMap.get(props.player.id))
-    }, [playerColumnStateAtom, props.player.id]));
+    const playerColumnState = useAtomValue(
+        useMemo(() => {
+            return selectAtom(playerColumnStateAtom, (columnStateMap) => columnStateMap.get(props.player.id));
+        }, [playerColumnStateAtom, props.player.id])
+    );
 
     const playerRowState = useAtomValue(playerRowStateAtom);
 
@@ -61,14 +63,19 @@ const GameBoardInner = (props: GameBoardProps) => {
             <div className={'mb-5 ml-[7.25rem] grid w-fit grid-cols-6'}>
                 {Array.from({ length: 6 }).map((_, index) => (
                     <div key={index} className={`h-12 w-24 p-2`}>
-                        <div data-is-used={playerColumnState?.includes(index)} className={'h-full w-full border-2 border-red-500 data-[is-used="false"]:bg-[#d2b48c24] data-[is-used="true"]:bg-[--primary-150]'}></div>
+                        <div
+                            data-is-used={playerColumnState?.includes(index)}
+                            className={
+                                'h-full w-full border-2 border-red-500 data-[is-used="false"]:bg-[#d2b48c24] data-[is-used="true"]:bg-[--primary-150]'
+                            }
+                        ></div>
                     </div>
                 ))}
             </div>
             <div className={'flex w-fit flex-row'}>
                 <div className={'mr-4 grid grid-rows-6 border-2 border-[--primary-60]'}>
                     {Array.from({ length: 6 }).map((_, index) => (
-                        <div className={'relative flex h-24 max-h-full items-center justify-center'}>
+                        <div key={index} className={'relative flex h-24 max-h-full items-center justify-center'}>
                             <div
                                 key={index}
                                 className={`h-24 w-24 bg-[#d2b48c24] p-2 ${index !== 0 ? 'border-t-2 border-[--primary-60]' : ''}`}
@@ -77,11 +84,15 @@ const GameBoardInner = (props: GameBoardProps) => {
                             </div>
                             {playerRowState.get(index) !== undefined && (
                                 <>
-                                    <span className={'absolute left-0 top-0 text-gray-600'}>{playerRowState?.get(index)!.layers}</span>
-                                    <span className={'absolute right-0 top-0 text-gray-600'}>{playerRowState?.get(index)!.tileQuantity}</span>
+                                    <span className={'absolute left-0 top-0 text-gray-600'}>
+                                        {playerRowState?.get(index)!.layers}
+                                    </span>
+                                    <span className={'absolute right-0 top-0 text-gray-600'}>
+                                        {playerRowState?.get(index)!.tileQuantity}
+                                    </span>
                                 </>
                             )}
-                        </div>                        
+                        </div>
                     ))}
                 </div>
                 <div className={`grid aspect-square w-fit grid-cols-6 border-2 border-white`}>

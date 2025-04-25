@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { GamePieceSection } from '@/gamePieces/GamePieceSection';
 import { getRouteApi } from '@tanstack/react-router';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -13,7 +14,7 @@ import { GameBoard } from './GameBoard';
 import { GamePlayersSection } from './GamePlayersSection';
 import { GameRoomContext, makeGameRoomAtoms } from './gameRoomContext';
 import { useGameRoomContext } from './useGameRoomContext';
-import { Button } from '@/components/ui/button';
+import { GameSummarySection } from './GameSummarySection';
 
 const route = getRouteApi('/game/$gameId/room');
 
@@ -43,11 +44,14 @@ const GameRoomInner = () => {
         selectedPieceAtom,
         removePieceAtom,
         selectedPieceRotationAtom,
-        roundAtom
+        roundAtom,
+        playStateAtom
     } = useGameRoomContext();
     const game = useAtomValue(gameAtom);
     const currentPlayer = useAtomValue(currentPlayerAtom);
     const round = useAtomValue(roundAtom);
+    const playState = useAtomValue(playStateAtom);
+
     const selectedUser = useSelectedUser()!;
     const selectedPiece = useAtomValue(selectedPieceAtom);
     const selectedPieceRotation = useAtomValue(selectedPieceRotationAtom);
@@ -120,8 +124,14 @@ const GameRoomInner = () => {
         <div>
             <div className={'mx-auto h-[50rem] w-full max-w-screen-2xl'}>
                 <div className={'mb-5 mt-5 flex h-[15rem]'}>
-                    <GamePlayersSection />
-                    <GamePieceSection />
+                    {playState === 'gameOver' ? (
+                        <GameSummarySection />
+                    ) : (
+                        <>
+                            <GamePlayersSection />
+                            <GamePieceSection />
+                        </>
+                    )}
                 </div>
                 <div className={'flex h-[55rem] gap-16'}>
                     <Carousel className={'flex-none'} setApi={setApi}>
@@ -155,27 +165,29 @@ const GameRoomInner = () => {
                             <div className={'h-[90%] content-center'}>
                                 <GameBoard game={game} player={myPlayer} isMyPlayer onPlacePiece={onPlacePiece} />
                             </div>
-                            <div className={'flex flex-col gap-2'}>
-                                <div className={'text-slate-500'}>
-                                    {currentPlayer?.id === myPlayer?.id
-                                        ? 'Your turn'
-                                        : `Waiting for ${currentPlayer?.name} to take their turn...`}
+                            {playState !== 'gameOver' && (
+                                <div className={'flex flex-col gap-2'}>
+                                    <div className={'text-slate-500'}>
+                                        {currentPlayer?.id === myPlayer?.id
+                                            ? 'Your turn'
+                                            : `Waiting for ${currentPlayer?.name} to take their turn...`}
+                                    </div>
+                                    <div>
+                                        {currentPlayer?.id === myPlayer?.id ? (
+                                            <Button
+                                                variant={'outline'}
+                                                size={'sm'}
+                                                className={
+                                                    'hover:shadow-[--primary-50]/60 hover:border-primary/70 hover:bg-[--primary-30] hover:shadow-sm'
+                                                }
+                                                onClick={() => onPassTurn()}
+                                            >
+                                                {'Pass turn'}
+                                            </Button>
+                                        ) : null}
+                                    </div>
                                 </div>
-                                <div>
-                                    {currentPlayer?.id === myPlayer?.id ? (
-                                        <Button
-                                            variant={'outline'}
-                                            size={'sm'}
-                                            className={
-                                                'hover:shadow-[--primary-50]/60 hover:border-primary/70 hover:bg-[--primary-30] hover:shadow-sm'
-                                            }
-                                            onClick={() => onPassTurn()}
-                                        >
-                                            {'Pass turn'}
-                                        </Button>
-                                    ) : null}
-                                </div>
-                            </div>
+                            )}
                         </Card>
                         <span className={'text-3xl font-extralight tracking-wider text-[--primary-90]'}>{myPlayer?.name}</span>
                     </div>
@@ -197,13 +209,24 @@ const GameRoomContextProvider = (props: { game: IGameDto; selectedUser: IUserDto
 };
 
 const GameRoomContextUpdater = (props: { game: IGameDto }) => {
-    const { gameAtom, currentPlayerAtom, roundAtom, roundPiecesAtom, maxRoundAtom, playerColumnStateAtom } = useGameRoomContext();
+    const {
+        gameAtom,
+        currentPlayerAtom,
+        roundAtom,
+        roundPiecesAtom,
+        maxRoundAtom,
+        playerColumnStateAtom,
+        fifthLayerBonusesAtom,
+        playStateAtom
+    } = useGameRoomContext();
 
     const setGame = useSetAtom(gameAtom);
     const setCurrentPlayer = useSetAtom(currentPlayerAtom);
     const setRound = useSetAtom(roundAtom);
     const setRoundPieces = useSetAtom(roundPiecesAtom);
     const setPlayerColumnState = useSetAtom(playerColumnStateAtom);
+    const setFifthLayerBonuses = useSetAtom(fifthLayerBonusesAtom);
+    const setPlayState = useSetAtom(playStateAtom);
     const maxRound = useAtomValue(maxRoundAtom);
 
     const currentPlayer = getCurrentPlayer(props.game);
@@ -217,7 +240,7 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
     }, [currentPlayer, setCurrentPlayer]);
 
     useEffect(() => {
-        const { round, roundPieces, playerColumnState } = getRoundAndRoundPiecesFromPlayerTurns(
+        const { round, roundPieces, playerColumnState, fifthLayerBonuses, playState } = getRoundAndRoundPiecesFromPlayerTurns(
             props.game,
             props.game.turns,
             maxRound
@@ -225,7 +248,9 @@ const GameRoomContextUpdater = (props: { game: IGameDto }) => {
         setRound(round);
         setRoundPieces(roundPieces);
         setPlayerColumnState(playerColumnState);
-    }, [maxRound, props.game, setPlayerColumnState, setRound, setRoundPieces]);
+        setFifthLayerBonuses(fifthLayerBonuses);
+        setPlayState(playState);
+    }, [maxRound, props.game, setFifthLayerBonuses, setPlayState, setPlayerColumnState, setRound, setRoundPieces]);
 
     return null;
 };

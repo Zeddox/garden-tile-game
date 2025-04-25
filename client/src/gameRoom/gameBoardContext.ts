@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import React from 'react';
-import { ColumnData, GameCellState, getGameBoardCellsFromPlayerTurns, initColumnData, RowState } from './game';
 import { IPlayerDto, ITurnDto, TileDto } from '../generated/backend';
+import { GameCellState, getGameBoardCellsFromPlayerTurns, RowState } from './game';
 
 export type GameBoardContextValue = ReturnType<typeof makeGameBoardAtoms>;
 
@@ -15,13 +15,11 @@ export const makeGameBoardAtoms = (state: {
 }) => {
     const gameBoardCells = getGameBoardCellsFromPlayerTurns(state.playerTurns, state.player, state.tileMap);
 
-    const gameBoardCellMapAtom = atom<Map<number, Map<number, GameCellState>>>(
-        gameBoardCells
-    );
+    const gameBoardCellMapAtom = atom<Map<number, Map<number, GameCellState>>>(gameBoardCells);
 
     // Derived atom
     // Derived from gameBoardCellMapAtom, changes to this atom will trigger changes to playerRowStateAtom
-    const playerRowStateAtom = atom<Map<number, RowState>>(get => getPlayerRowState(get(gameBoardCellMapAtom)));
+    const playerRowStateAtom = atom<Map<number, RowState>>((get) => getPlayerRowState(get(gameBoardCellMapAtom)));
 
     const placePieceCallbackAtom = atom<((placement: { x: number; y: number }) => void) | undefined>(undefined);
 
@@ -47,12 +45,12 @@ export const getPlayerRowState = (gameBoardCells: ReturnType<typeof getGameBoard
     gameBoardCells.forEach((x) => {
         x.forEach((y, i) => {
             if (!rowState.has(i)) {
-                rowState.set(i, { layers: 0, tileQuantity: 0});
+                rowState.set(i, { layers: 0, tileQuantity: 0 });
             }
 
             const state = rowState.get(i)!;
 
-            if (((y.layer ?? 0) > state.layers) && y.tileType !== undefined) {
+            if ((y.layer ?? 0) > state.layers && y.tileType !== undefined) {
                 state.layers = y.layer!;
             }
 

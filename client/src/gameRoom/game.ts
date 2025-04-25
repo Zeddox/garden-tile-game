@@ -41,7 +41,7 @@ export type ColumnData = {
 export type RowState = {
     layers: number;
     tileQuantity: number;
-}
+};
 
 export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player: IPlayerDto, tileMap: Map<string, TileDto>) => {
     const gameBoardCellsState = new Map<number, Map<number, GameCellState>>(
@@ -125,22 +125,57 @@ export const getGameBoardCellsFromPlayerTurns = (playerTurns: ITurnDto[], player
     return gameBoardCellsState;
 };
 
+type GameRoomState = {
+    round: number;
+    roundPieces: TileDto[];
+    playerColumnState: Map<string, number[]>;
+    fifthLayerBonuses: { tileType: TileType; playerId?: string }[];
+    playState: 'inProgress' | 'gameOver';
+};
+
 export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurns: ITurnDto[], maxRound: number) => {
     const turns = playerTurns.sort((a, b) => a.turnNumber - b.turnNumber);
+
+    const result: GameRoomState = {
+        playState: 'inProgress',
+        round: 1,
+        roundPieces: getRoundTiles(game, 1),
+        playerColumnState: new Map<string, number[]>(),
+        fifthLayerBonuses: [
+            { tileType: TileType.MapleTree },
+            { tileType: TileType.Pagoda },
+            { tileType: TileType.Fish },
+            { tileType: TileType.AzaleaBush },
+            { tileType: TileType.Boxwood },
+            { tileType: TileType.Stone }
+        ]
+    };
+
     const round = turns.reduce((round, turn) => {
+        if (turn.layer === 5) {
+            const tileType = getRoundTiles(game, turn.round).find((x) => x.id === turn.tileId)?.type;
+            if (tileType) {
+                const fifthLayerBonus = result.fifthLayerBonuses.find((x) => x.tileType === tileType);
+                if (fifthLayerBonus !== undefined && fifthLayerBonus.playerId === undefined) {
+                    fifthLayerBonus.playerId = turn.playerId;
+                }
+            }
+        }
         if (turn.round > round) {
             return round + 1;
         }
         return round;
     }, 1);
 
-    const result = { round: round, roundPieces: getRoundTiles(game, round), playerColumnState: new Map<string, number[]>() };
+    result.round = round;
+    result.roundPieces = getRoundTiles(game, round);
 
-    for (const turn of turns.filter((x) => x.round === round)) {
+    const roundTurns = turns.filter((x) => x.round === round);
+
+    for (const turn of roundTurns) {
         if (!result.playerColumnState.has(turn.playerId)) {
             result.playerColumnState.set(turn.playerId, []);
         }
-
         const playerColumnState = result.playerColumnState.get(turn.playerId);
         playerColumnState!.push(turn.positionX);
 
@@ -149,14 +184,27 @@ export const getRoundAndRoundPiecesFromPlayerTurns = (game: IGameDto, playerTurn
             result.roundPieces.splice(pieceIndex, 1);
         }
     }
-
-    if (result.roundPieces.length === 0) {
+    
+    const playerPasses = new Set<string>();
+    const reversedTurns = roundTurns.reverse();
+    
+    for (const turn of reversedTurns) {
+        if (turn.rotation === TileRotation.Pass || result.playerColumnState.get(turn.playerId)?.length === 6) {
+            playerPasses.add(turn.playerId);
+         }
+         else {
+            break;
+         }
+    }
+    
+    if (result.roundPieces.length === 0 || playerPasses.size === game.players.length) {
         if (result.round < maxRound) {
             result.round += 1;
             result.roundPieces = getRoundTiles(game, result.round);
             result.playerColumnState.clear();
         } else {
             console.log('GAME OVER');
+            result.playState = 'gameOver';
         }
     }
 
@@ -347,3 +395,60 @@ export const initColumnData: () => ColumnData[] = () => {
         isUsed: false
     }));
 };
+
+export const getFifthLayerBonusAmount = (tileType: TileType) => {
+    switch (tileType) {
+        case TileType.MapleTree:
+            return 10;
+        case TileType.Pagoda:
+            return 9;
+        case TileType.Fish:
+            return 8;
+        case TileType.AzaleaBush:
+            return 7;
+        case TileType.Boxwood:
+            return 6;
+        case TileType.Stone:
+            return 5;
+        default:
+            return 0;
+    }
+};
+
+export const getMostQuantityBonuses = (tileType: TileType) => {
+    switch (tileType) {
+        case TileType.MapleTree:
+            return 15;
+        case TileType.Pagoda:
+            return 12;
+        case TileType.Fish:
+            return 9;
+        case TileType.AzaleaBush:
+            return 8;
+        case TileType.Boxwood:
+            return 7;
+        case TileType.Stone:
+            return 6;
+        default:
+            return 0;
+    }
+ };
+
+ export const getSecondMostQuantityBonuses = (tileType: TileType) => {
+    switch (tileType) {
+        case TileType.MapleTree:
+            return 7;
+        case TileType.Pagoda:
+            return 6;
+        case TileType.Fish:
+            return 4;
+        case TileType.AzaleaBush:
+            return 4;
+        case TileType.Boxwood:
+            return 3;
+        case TileType.Stone:
+            return 3;
+        default:
+            return 0;
+    }
+ };

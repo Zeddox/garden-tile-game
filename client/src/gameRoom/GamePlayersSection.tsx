@@ -1,12 +1,15 @@
 import { useAtomValue } from 'jotai';
 import { FaCrown } from 'react-icons/fa';
-import { getRoundTiles } from './game';
+import { getFifthLayerBonusAmount, getRoundTiles } from './game';
 import { useGameRoomContext } from './useGameRoomContext';
+import { TileType } from '@/generated/backend';
+import { GiFlowers, GiLindenLeaf, GiCirclingFish, GiFruitTree, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
 
 export const GamePlayersSection = () => {
-    const { gameAtom, currentPlayerAtom } = useGameRoomContext();
+    const { gameAtom, currentPlayerAtom, fifthLayerBonusesAtom } = useGameRoomContext();
     const game = useAtomValue(gameAtom);
     const currentPlayer = useAtomValue(currentPlayerAtom);
+    const fifthLayerBonuses = useAtomValue(fifthLayerBonusesAtom);
 
     const players = game.players;
 
@@ -19,6 +22,12 @@ export const GamePlayersSection = () => {
         }
         return scores;
     }, new Map<string, number>());
+
+    fifthLayerBonuses.forEach((x) => {
+        if (x.playerId !== undefined) {
+            scores.set(x.playerId, (scores.get(x.playerId) ?? 0) + getFifthLayerBonusAmount(x.tileType));
+        }
+    });
 
     return (
         <div className={'bg-slate w-1/4 flex-auto border-slate-700/40'}>
@@ -35,10 +44,36 @@ export const GamePlayersSection = () => {
                             <span>{player.name}</span>
                             {player.gameLeader ? <FaCrown /> : null}
                         </div>
-                        <div className={'font-semibold'}>{scores.get(player.id) ?? 0}</div>
+                        <div className={'flex items-center gap-2'}>
+                            {fifthLayerBonuses
+                                .filter((x) => x.playerId === player.id)
+                                .map((x) => (
+                                    <span key={x.tileType} className={'h-4 w-4 rounded-sm'}>
+                                        {getTileTypeIcon(x.tileType)}
+                                    </span>
+                                ))}
+                            <div className={'font-semibold'}>{scores.get(player.id) ?? 0}</div>
+                        </div>
                     </div>
                 ))}
             </div>
         </div>
     );
+};
+
+const getTileTypeIcon = (tileType: TileType) => {
+    switch (tileType) {
+        case TileType.AzaleaBush:
+            return <GiFlowers />;
+        case TileType.Boxwood:
+            return <GiLindenLeaf />;
+        case TileType.Fish:
+            return <GiCirclingFish />;
+        case TileType.MapleTree:
+            return <GiFruitTree />;
+        case TileType.Pagoda:
+            return <GiMushroomHouse />;
+        default:
+            return <GiStonePile />;
+    }
 };
