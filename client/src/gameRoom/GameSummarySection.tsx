@@ -1,9 +1,15 @@
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
-import { getFifthLayerBonusAmount, getGameBoardCellsFromPlayerTurns, getMostQuantityBonuses, getRoundTiles, getSecondMostQuantityBonuses, getTileMap } from './game';
+import { GiCirclingFish, GiFlowers, GiFruitTree, GiLindenLeaf, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
+import {
+    getFifthLayerBonusAmount,
+    getGameBoardCellsFromPlayerTurns,
+    getMostQuantityBonuses,
+    getRoundTiles,
+    getSecondMostQuantityBonuses,
+    getTileMap
+} from './game';
 import { useGameRoomContext } from './useGameRoomContext';
-import { GiFlowers, GiLindenLeaf, GiCirclingFish, GiFruitTree, GiMushroomHouse, GiStonePile } from 'react-icons/gi';
-import { TileType } from '@/generated/backend';
 
 export const GameSummarySection = () => {
     const { gameAtom, fifthLayerBonusesAtom } = useGameRoomContext();
@@ -60,10 +66,12 @@ export const GameSummarySection = () => {
 
         sortedTypeQuantitiesMap.forEach((playerQuantities, index) => {
             playerQuantities.sort((a, b) => b.quantity - a.quantity);
-            
-            const mostPlayerIds = playerQuantities.filter((x) => x.quantity === playerQuantities[0].quantity).map((x) => x.playerId);
 
-            mostPlayerIds.forEach((playerId) => { 
+            const mostPlayerIds = playerQuantities
+                .filter((x) => x.quantity === playerQuantities[0].quantity)
+                .map((x) => x.playerId);
+
+            mostPlayerIds.forEach((playerId) => {
                 scores.set(playerId, (scores.get(playerId) ?? 0) + getMostQuantityBonuses(index));
             });
 
@@ -77,7 +85,9 @@ export const GameSummarySection = () => {
                     (x) => x.quantity < mostQuantityBonuses.get(index)!.quantity
                 )[0].quantity;
 
-                const secondMostPlayerIds = playerQuantities.filter((x) => x.quantity === secondMostQuantity).map((x) => x.playerId);
+                const secondMostPlayerIds = playerQuantities
+                    .filter((x) => x.quantity === secondMostQuantity)
+                    .map((x) => x.playerId);
                 secondMostPlayerIds.forEach((playerId) => {
                     scores.set(playerId, (scores.get(playerId) ?? 0) + getSecondMostQuantityBonuses(index));
                 });
@@ -89,7 +99,7 @@ export const GameSummarySection = () => {
             }
         });
         return { mostQuantityBonuses, secondMostQuantityBonuses };
-    }, [visibleTypeQuantitiesMap]);
+    }, [scores, visibleTypeQuantitiesMap]);
 
     return (
         <div className={'bg-slate w-1/4 flex-auto border-slate-700/40'}>
